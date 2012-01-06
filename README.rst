@@ -7,7 +7,8 @@ righteous! : Python RightScale API client
 
 Michael Joseph 2012
 
-## (Un)license
+(Un)license
+-----------
 
 This is free and unencumbered software released into the public domain.
 
