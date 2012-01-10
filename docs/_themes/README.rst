@@ -1,8 +1,8 @@
-krTheme Sphinx Style
-====================
+righteous Sphinx Style
+======================
 
-This repository contains sphinx styles Kenneth Reitz uses in most of 
-his projects. It is a derivative of Mitsuhiko's themes for Flask and Flask related
+This repository contains a sphinx style for righteous, derivde from  Kenneth Reitz's
+request theme, which is turn a derivative of Mitsuhiko's themes for Flask and Flask related
 projects.  To use this style in your Sphinx documentation, follow
 this guide:
 
@@ -11,15 +11,12 @@ this guide:
 
 2. add this to your conf.py: ::
 
-	sys.path.append(os.path.abspath('_themes'))
-	html_theme_path = ['_themes']
-	html_theme = 'flask'
+    sys.path.append(os.path.abspath('_themes'))
+    html_theme_path = ['_themes']
+    html_theme = 'righteous'
 
 The following themes exist:
 
-**kr**
-	the standard flask documentation theme for large projects
-
-**kr_small**
-	small one-page theme.  Intended to be used by very small addon libraries.
+**righteous**
+    based on the the small one-page flask_small theme.  Intended to be used by very small flask addon libraries.
 
