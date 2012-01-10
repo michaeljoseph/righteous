@@ -33,6 +33,13 @@ def _request(path, method='GET', body=None, headers={}):
     return requests.request(method, path, data=body, headers=_build_headers(headers=headers))
 
 def init(account_defaults, server_defaults, debug=False):
+    """
+    Initialises righteous configuration
+
+    :param account_defaults: Dictionary
+    :param server_defaults: Dictionary
+    :param debug: (optional) Boolean controlling debug output
+    """
     config.settings.api_base = 'https://my.rightscale.com/api/acct/%s' % account_defaults['account_id']
     config.settings.default_deployment_id = account_defaults['default_deployment_id']
     config.settings.debug = debug
@@ -48,6 +55,9 @@ def init(account_defaults, server_defaults, debug=False):
 def login(username=None, password=None):
     """
     Logins to RightScale and stores the auth cookie for future requests
+
+    :param username: (optional) String representing the username to login with
+    :param password: (optional) String representing the password to login with
     """
     if not username or not password:
         username = config.settings.username
@@ -61,9 +71,13 @@ def login(username=None, password=None):
         return True
     return False
 
-def list_deployment_servers(deployment_id=None):
+def list_servers(deployment_id=None):
     """
     Lists servers in a deployment
+
+    Returns JSON
+
+    :param deployment_id: (optional) String representing Deployment to list servers from
     """
     if not deployment_id:
         deployment_id = config.settings.default_deployment_id
@@ -74,6 +88,8 @@ def list_deployment_servers(deployment_id=None):
 def find_server(nickname):
     """
     Finds a server based on nickname
+
+    :param nickname: (optional) String representing the nickname of the server to lookup
     """
     response = _request('%s/servers.js?filter=nickname=%s' % (config.settings.api_base, nickname))
     servers = simplejson.loads(response.content)
@@ -92,6 +108,9 @@ def _lookup_server(server_href, nickname):
 def server_info(server_href, nickname=None):
     """
     Detailed server information
+
+    :param server_href: URL representing the server to retrieve information about
+    :param nickname: (optional) String representing the nickname of the server
     """
     response = _request('%s.js' % _lookup_server(server_href, nickname))
     return simplejson.loads(response.content)
@@ -99,6 +118,9 @@ def server_info(server_href, nickname=None):
 def server_settings(server_href, nickname=None):
     """
     Current server settings
+
+    :param server_href: URL representing the server to query settngs from
+    :param nickname: (optional) String representing the nickname of the server
     """
     response = _request('%s/settings.js' % _lookup_server(server_href, nickname))
     return simplejson.loads(response.content)
@@ -106,18 +128,27 @@ def server_settings(server_href, nickname=None):
 def start_server(server_href, nickname=None):
     """
     Starts a server.
+
+    :param server_href: URL representing the server to start
+    :param nickname: (optional) String representing the nickname of the server
     """
     return _request('%s/start' % _lookup_server(server_href, nickname), method='POST')
 
 def stop_server(server_href, nickname=None):
     """
     Stops a server.
+
+    :param server_href: URL representing the server to stop
+    :param nickname: (optional) String representing the nickname of the server
     """
     return _request('%s/stop' % _lookup_server(server_href, nickname), method='POST').status_code == 201
 
 def delete_server(server_href, nickname=None):
     """
     Deletes a server from RightScale
+
+    :param server_href: URL representing the server to delete
+    :param nickname: (optional) String representing the nickname of the server
     """
     return _request(_lookup_server(server_href, nickname), method='DELETE').status_code == 200
 
@@ -125,9 +156,8 @@ def create_server(nickname, defaults=None):
     """
     Create a server.
 
-    Args:
-        nickname (str): the nickname of the server
-        defaults (dict): server defaults
+    :param nickname: String representing the nickname of the server
+    :param defaults: (optional) Dictionary of server creation default properties
     """
     if not defaults:
         defaults = config.settings.server_defaults
@@ -139,13 +169,12 @@ def create_server(nickname, defaults=None):
     _debug('Created %s: %s' % (nickname, location))
     return location
 
-def update_input_parameters(server_href, parameters):
+def _update_input_parameters(server_href, parameters):
     """
     Updates/sets any ServerTemplate parameters for a server
 
-    Args:
-        server_href (url): the server reference url
-        parameters (dict): ServerTemplate parameters
+    :param server_url: URL representing the server to update
+    :param parameters: Dictionary of ServerTemplate parameters to update
     """
     input_data = []
     for key,value in parameters.items():
@@ -162,7 +191,7 @@ def create_and_start_server(nickname, parameters):#defaults, parameters):
     :param parameters: Dictionary of ServerTemplate parameters
     """
     server_href = create_server(nickname)#, defaults)
-    response = update_input_parameters(server_href, parameters)
+    response = _update_input_parameters(server_href, parameters)
     start_server_response = start_server(server_href)
     success = start_server_response.status_code == 201
     location = start_server_response.headers['location'] if success else None
