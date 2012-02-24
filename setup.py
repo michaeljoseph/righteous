@@ -18,7 +18,7 @@ if sys.argv[-1] == "test":
     sys.exit()
 
 required = [
-    'requests', 'clint',
+    'requests==0.6.4', 'clint',
 ]
 
 if sys.version_info[:2] < (2,6):
