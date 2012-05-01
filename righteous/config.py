@@ -59,3 +59,4 @@ settings.cookies = None
 settings.username = None
 settings.password = None
 settings.account_id = None
+settings.requests_config = {}
