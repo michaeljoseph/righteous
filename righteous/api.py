@@ -8,7 +8,7 @@ Implements the RightScale API for EC2 instance management.
 http://support.rightscale.com/15-References/RightScale_API_Reference_Guide/02-Management/02-Servers
 """
 
-import config
+from . import config
 import sys, base64
 import requests
 from urllib import urlencode
@@ -16,12 +16,17 @@ try:
     import json as simplejson
 except ImportError:
     import simplejson
+from logging import getLogger
+log = getLogger(__name__)
+
+ACCOUNT_URL = 'https://my.rightscale.com/api/acct/'
 
 def _debug(message):
+    log.debug(message)
     if config.settings.debug:
         config.settings.debug.write('%s\n' % message)
 
-def _build_headers(headers={}):
+def _build_headers(headers=None):
     request_headers = {'X-API-VERSION': '1.0'}
     if headers:
         request_headers.update(headers)
@@ -29,45 +34,64 @@ def _build_headers(headers={}):
         request_headers['Cookie'] = config.settings.cookies
     return request_headers
 
-def _request(path, method='GET', body=None, headers={}):
-    return requests.request(method, path, data=body, headers=_build_headers(headers=headers))
+def _request(path, method='GET', body=None, headers={}, prepend_api_base=True):
+    if prepend_api_base:
+        path = ACCOUNT_URL + config.settings.account_id + path
+    return requests.request(method, path, data=body, headers=_build_headers(headers=headers), config=config.settings.requests_config or {})
 
-def init(account_defaults, server_defaults, debug=False):
+def init(username, password, account_id, **kwargs):
     """
     Initialises righteous configuration
 
-    :param account_defaults: Dictionary
-    :param server_defaults: Dictionary
-    :param debug: (optional) Boolean controlling debug output
+    :param username: String of a Rightscale username
+    :param password: String of the user's password
+    :param account_id: String of the Rightscale account_id
+    :params kwargs: Key word arguments for additional configuration
     """
-    config.settings.api_base = 'https://my.rightscale.com/api/acct/%s' % account_defaults['account_id']
-    config.settings.default_deployment_id = account_defaults['default_deployment_id']
-    config.settings.debug = debug
-    config.settings.account_defaults = account_defaults
-    config.settings.server_defaults = server_defaults
-    if config.settings.debug:
-        requests.settings.verbose = sys.stderr
-        config.settings.debug = sys.stderr
-    if 'username' in account_defaults and 'password' in account_defaults:
-        config.settings.username = account_defaults['username']
-        config.settings.password = account_defaults['password']
 
-def login(username=None, password=None):
+    if not username or not password or not account_id:
+        raise Exception('Username, password and account_id are required parameters')
+
+    config.settings.username = username
+    config.settings.password = password
+    config.settings.account_id = account_id
+    config.settings.api_base = ACCOUNT_URL + account_id
+
+    config.settings.default_deployment_id = kwargs.get('default_deployment_id', None)
+    config.settings.debug = kwargs.get('debug', False)
+
+    config.settings.create_server_parameters = {}
+    for key, value in kwargs.items():
+        config.settings.create_server_parameters[key] = value
+        if key=='default_deployment_id':
+            config.settings.create_server_parameters['deployment_href'] = '%s%s/deployments/%s' % (ACCOUNT_URL, account_id, config.settings.default_deployment_id)
+
+    if config.settings.debug:
+        config.settings.requests_config = {'verbose': sys.stderr}
+        config.settings.debug = sys.stderr
+
+def login(username=None, password=None, account_id=None):
     """
     Logins to RightScale and stores the auth cookie for future requests
 
     :param username: (optional) String representing the username to login with
     :param password: (optional) String representing the password to login with
+    :param account_id: (optional) String of the Rightscale account_id
     """
-    if not username or not password:
+    if not username or not password or not account_id:
         username = config.settings.username
         password = config.settings.password
+        account_id = config.settings.account_id
 
-    if not username or not password:
-        raise Exception('Username and password not specified in configuration or on the command line')
-    response = _request('%s/login' % config.settings.api_base, headers={'Authorization':"Basic %s" % base64.encodestring('%s:%s' % (username, password))[:-1]})
+    if not username or not password or not account_id:
+        raise Exception('Username, password or account_id not specified in configuration or as an API parameter')
+
+    response = _request('/login', headers={'Authorization':"Basic %s" % base64.encodestring('%s:%s' % (username, password))[:-1]})
+
     if response.status_code == 204:
         config.settings.cookies = response.headers['set-cookie']
+        config.settings.username = username
+        config.settings.password = password
         return True
     return False
 
@@ -81,9 +105,12 @@ def list_servers(deployment_id=None):
     """
     if not deployment_id:
         deployment_id = config.settings.default_deployment_id
-    response = _request('%s/deployments/%s.js' % (config.settings.api_base, deployment_id))
-    return simplejson.loads(response.content)
 
+    if not deployment_id:
+        raise Exception('Deployment id not specified in configuration or as an API parameter')
+
+    response = _request('/deployments/%s.js' % deployment_id)
+    return simplejson.loads(response.content)
 
 def find_server(nickname):
     """
@@ -91,10 +118,10 @@ def find_server(nickname):
 
     :param nickname: (optional) String representing the nickname of the server to lookup
     """
-    response = _request('%s/servers.js?filter=nickname=%s' % (config.settings.api_base, nickname))
+    response = _request('/servers.js?filter=nickname=%s' % nickname)
+
     servers = simplejson.loads(response.content)
     return servers[0] if len(servers) else None
-
 
 def _lookup_server(server_href, nickname):
     if not nickname and not server_href:
@@ -112,7 +139,7 @@ def server_info(server_href, nickname=None):
     :param server_href: URL representing the server to retrieve information about
     :param nickname: (optional) String representing the nickname of the server
     """
-    response = _request('%s.js' % _lookup_server(server_href, nickname))
+    response = _request('%s.js' % _lookup_server(server_href, nickname), prepend_api_base=False)
     return simplejson.loads(response.content)
 
 def server_settings(server_href, nickname=None):
@@ -122,7 +149,7 @@ def server_settings(server_href, nickname=None):
     :param server_href: URL representing the server to query settngs from
     :param nickname: (optional) String representing the nickname of the server
     """
-    response = _request('%s/settings.js' % _lookup_server(server_href, nickname))
+    response = _request('%s/settings.js' % _lookup_server(server_href, nickname), prepend_api_base=False)
     return simplejson.loads(response.content)
 
 def start_server(server_href, nickname=None):
@@ -132,7 +159,7 @@ def start_server(server_href, nickname=None):
     :param server_href: URL representing the server to start
     :param nickname: (optional) String representing the nickname of the server
     """
-    return _request('%s/start' % _lookup_server(server_href, nickname), method='POST')
+    return _request('%s/start' % _lookup_server(server_href, nickname), method='POST', prepend_api_base=False)
 
 def stop_server(server_href, nickname=None):
     """
@@ -141,7 +168,7 @@ def stop_server(server_href, nickname=None):
     :param server_href: URL representing the server to stop
     :param nickname: (optional) String representing the nickname of the server
     """
-    return _request('%s/stop' % _lookup_server(server_href, nickname), method='POST').status_code == 201
+    return _request('%s/stop' % _lookup_server(server_href, nickname), method='POST', prepend_api_base=False).status_code == 201
 
 def delete_server(server_href, nickname=None):
     """
@@ -150,49 +177,57 @@ def delete_server(server_href, nickname=None):
     :param server_href: URL representing the server to delete
     :param nickname: (optional) String representing the nickname of the server
     """
-    return _request(_lookup_server(server_href, nickname), method='DELETE').status_code == 200
+    return _request(_lookup_server(server_href, nickname), method='DELETE', prepend_api_base=False).status_code == 200
 
-def create_server(nickname, defaults=None):
+def create_server(nickname, create_server_parameters=None):
     """
     Create a server.
 
     :param nickname: String representing the nickname of the server
-    :param defaults: (optional) Dictionary of server creation default properties
+    :param create_server_parameters: (optional) Dictionary of server creation parameters
     """
-    if not defaults:
-        defaults = config.settings.server_defaults
+    if not create_server_parameters:
+        create_server_parameters = config.settings.create_server_parameters
+
     create_data = {'server[nickname]' : nickname}
-    for key, value in defaults.items():
+    for key, value in create_server_parameters.items():
         create_data['server[%s]' % key] = value
-    response = _request('%s/servers' % config.settings.api_base, method='POST', body=urlencode(create_data))
-    location = response.headers['location']
-    _debug('Created %s: %s' % (nickname, location))
+    response = _request('/servers', method='POST', body=urlencode(create_data))
+
+    location = response.headers.get('location')
+    _debug('Created %s: %s (%s:%s)' % (nickname, location, response.status_code, response.content))
     return location
 
-def _update_input_parameters(server_href, parameters):
+def set_server_parameters(server_href, parameters):
     """
     Updates/sets any ServerTemplate parameters for a server
 
     :param server_url: URL representing the server to update
-    :param parameters: Dictionary of ServerTemplate parameters to update
+    :param parameters: Dictionary of ServerTemplate parameters to set
     """
     input_data = []
     for key,value in parameters.items():
         input_data.append('server[parameters][%s]=text:%s' % (key.upper(), value))
     update = '&'.join(input_data)
-    return _request('%s' % server_href, method='PUT', body=update, headers={'Content-Type': 'application/x-www-form-urlencoded'})
+    return _request(server_href, method='PUT', body=update, headers={'Content-Type': 'application/x-www-form-urlencoded'}, prepend_api_base=False)
 
-def create_and_start_server(nickname, parameters):#defaults, parameters):
+def create_and_start_server(nickname, create_server_parameters=None, server_template_parameters=None):
     """Creates and starts a server.
     Returns a tuple of operation status, href of the created, started server
 
     :param nickname: String representing the nickname of the server
-    :param defaults: Dictionary of server creation default properties
-    :param parameters: Dictionary of ServerTemplate parameters
+    :param create_server_parameters: (optional) Dictionary of server creation parameters
+    :param server_template_parameters: (optional) Dictionary of ServerTemplate parameters
     """
-    server_href = create_server(nickname)#, defaults)
-    response = _update_input_parameters(server_href, parameters)
-    start_server_response = start_server(server_href)
-    success = start_server_response.status_code == 201
-    location = start_server_response.headers['location'] if success else None
-    return success, location
+    server_href = create_server(nickname, create_server_parameters)
+
+    if server_href:
+        if server_template_parameters:
+            set_server_parameters(server_href, server_template_parameters)
+
+        start_server_response = start_server(server_href)
+        success = start_server_response.status_code == 201
+        location = start_server_response.headers['location'] if success else None
+        return success, location
+    else:
+        return False, None
