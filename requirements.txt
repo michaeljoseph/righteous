@@ -1,2 +1,4 @@
 requests
 clint
+flexmock
+testify
