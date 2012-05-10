@@ -18,7 +18,7 @@ if sys.argv[-1] == "test":
     sys.exit()
 
 required = [
-    'requests==0.6.4', 'clint',
+    'requests==0.10.8', 'clint',
 ]
 
 if sys.version_info[:2] < (2,6):
@@ -26,7 +26,7 @@ if sys.version_info[:2] < (2,6):
 
 setup(
     name='righteous',
-    version='0.0.1',
+    version='0.0.2',
     description='Python RightScale API client.',
     long_description=open('README.rst').read(),
     author='Michael Joseph',
