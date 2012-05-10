@@ -5,7 +5,7 @@ import os
 import sys
 import base64
 from uuid import uuid4
-from testify import TestCase, assert_raises, assert_equal, run
+from testify import *
 import requests
 import righteous
 from righteous import config
@@ -87,7 +87,7 @@ class RighteousUnitTestCase(TestCase):
 
     def test_list_servers(self):
         assert_raises(Exception, righteous.list_servers)
-
+1G
     def test_lookup_server(self):
         assert_raises(ValueError, righteous.api._lookup_server, None, None)
 
@@ -100,7 +100,3 @@ class RighteousUnitTestCase(TestCase):
         mock_request = flexmock(righteous.api)
         mock_request.should_receive('_request').with_args(server_href, method='PUT', body=expected, headers={'Content-Type': 'application/x-www-form-urlencoded'}, prepend_api_base=False)
         righteous.api.set_server_parameters(server_href, parameters)
-
-if __name__ == "__main__":
-    run()
-
