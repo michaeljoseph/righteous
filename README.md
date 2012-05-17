@@ -20,11 +20,14 @@ Get it from pypi (like it's hot):
 First, initialise righteous (to access read-only functionality, you just need to provide the following authentication parameters):
 
 ```python
-    import righteous
-    username, password = 'me@domain.com', 'security'
-    # find your RightScale account_id by
-    account_id = 123
-    righteous.init(username, password, account_id)
+import righteous
+username, password = 'me@domain.com', 'security'
+# find your RightScale account_id by
+account_id = 123
+righteous.init(username, password, account_id)
+
+# list servers
+servers = righteous.list_servers()
 ```
 
 ### CLI Usage
