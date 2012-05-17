@@ -7,3 +7,4 @@ docs/_build
 .gitignore
 righteous.config
 righteous.egg-info
+.tox
