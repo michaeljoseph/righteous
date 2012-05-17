@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import sys
 import base64
 from testify import *
@@ -9,10 +6,6 @@ import righteous
 from righteous import config
 from righteous.api import _build_headers
 from flexmock import flexmock
-try:
-    import json as simplejson
-except ImportError:
-    import simplejson
 
 
 class RighteousUnitTestCase(TestCase):
