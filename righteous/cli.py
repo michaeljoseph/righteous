@@ -105,7 +105,7 @@ def main():
 
     elif options.kill_env:
         for env in options.kill_env:
-            answer = raw_input('Confirm decommission of %s ([enter/y]/[n|no])' % env)
+            answer = raw_input('Confirm decommission of %s [Y/n]' % env)
             if answer in ['n', 'no']:
                 continue
             server = api.find_server(env)
