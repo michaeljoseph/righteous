@@ -12,10 +12,8 @@ from . import config
 import sys, base64
 import requests
 from urllib import urlencode
-try:
-    import json as simplejson
-except ImportError:
-    import simplejson
+import omnijson as json
+
 from logging import getLogger
 log = getLogger(__name__)
 
@@ -110,7 +108,7 @@ def list_servers(deployment_id=None):
         raise Exception('Deployment id not specified in configuration or as an API parameter')
 
     response = _request('/deployments/%s.js' % deployment_id)
-    return simplejson.loads(response.content)
+    return json.loads(response.content)
 
 def find_server(nickname):
     """
@@ -120,7 +118,7 @@ def find_server(nickname):
     """
     response = _request('/servers.js?filter=nickname=%s' % nickname)
 
-    servers = simplejson.loads(response.content)
+    servers = json.loads(response.content)
     return servers[0] if len(servers) else None
 
 def _lookup_server(server_href, nickname):
@@ -140,7 +138,7 @@ def server_info(server_href, nickname=None):
     :param nickname: (optional) String representing the nickname of the server
     """
     response = _request('%s.js' % _lookup_server(server_href, nickname), prepend_api_base=False)
-    return simplejson.loads(response.content)
+    return json.loads(response.content)
 
 def server_settings(server_href, nickname=None):
     """
@@ -150,7 +148,7 @@ def server_settings(server_href, nickname=None):
     :param nickname: (optional) String representing the nickname of the server
     """
     response = _request('%s/settings.js' % _lookup_server(server_href, nickname), prepend_api_base=False)
-    return simplejson.loads(response.content)
+    return json.loads(response.content)
 
 def start_server(server_href, nickname=None):
     """
