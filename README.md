@@ -4,7 +4,7 @@
 
 ![righteous](https://github.com/michaeljoseph/righteous/raw/master/resources/righteous.jpg)
 
-[![Build Status](https://secure.travis-ci.org/michaeljoseph/righteous.png)](http://travis-ci.org/michaeljoseph/righteous])
+[![Build Status](https://secure.travis-ci.org/michaeljoseph/righteous.png)](http://travis-ci.org/michaeljoseph/righteous)
 
 righteous provides an API to create, start/stop, delete, remove and introspect RightScale EC2 Servers.
 This library implements RightScale API 1.0 and has only been tested with EC2 instances using ServerTemplates and managed in a Deployment.
