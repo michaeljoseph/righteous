@@ -1,15 +1,7 @@
-#!/usr/bin/env python
-
-import os
 from uuid import uuid4
 from testify import *
 import righteous
-from flexmock import flexmock
 from ConfigParser import SafeConfigParser
-try:
-    import json as simplejson
-except ImportError:
-    import simplejson
 
 class RighteousTestCase(TestCase):
     envs = []
@@ -18,6 +10,8 @@ class RighteousTestCase(TestCase):
     def initialise_righteous(self):
         config = SafeConfigParser()
         config.read('righteous.config')
+        if not config.has_section('auth'):
+            raise Exception('Please create a righteous.config file with appropriate credentials')
 
         self.auth = dict((key,config.get('auth', key)) for key in config.options('auth'))
         self.server = dict((key,config.get('server-defaults', key)) for key in config.options('server-defaults'))
