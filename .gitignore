@@ -5,3 +5,4 @@ pylint.txt
 *.pyc
 docs/_build
 .gitignore
+righteous.config
