@@ -54,8 +54,8 @@ See all the options
 ### Development / Running the tests
 
     $ pip install -r requirements.txt
-    $ testify test.unit
-    $ testify test.integration 
+    $ testify tests.unit
+    $ testify tests.integration 
 
 The integration tests take a couple of  minutes to run since they tests all the current functionality (creating, starting, stopping, deleting environments)
 against RightScale.  These tests require a configured righteous.config in the root of the directory (copy and customise righteous.config.template)

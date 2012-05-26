@@ -21,7 +21,7 @@ setup(
     name='righteous',
     version='0.0.2',
     description='Python RightScale API client.',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     author='Michael Joseph',
     author_email='michaeljoseph@gmail.com',
     url='https://github.com/michaeljoseph/righteous',
