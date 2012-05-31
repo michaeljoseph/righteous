@@ -19,7 +19,7 @@ log = getLogger(__name__)
 
 ACCOUNT_URL = 'https://my.rightscale.com/api/acct/'
 
-def _debug(message):
+def debug(message):
     log.debug(message)
     if config.settings.debug:
         config.settings.debug.write('%s\n' % message)
@@ -35,7 +35,9 @@ def _build_headers(headers=None):
 def _request(path, method='GET', body=None, headers={}, prepend_api_base=True):
     if prepend_api_base:
         path = ACCOUNT_URL + config.settings.account_id + path
-    return requests.request(method, path, data=body, headers=_build_headers(headers=headers), config=config.settings.requests_config or {})
+    headers = _build_headers(headers=headers)
+    debug('%s to %s with data=%s, headers=%s', method, path, body, headers)
+    return requests.request(method, path, data=body, headers=headers, config=config.settings.requests_config or {})
 
 def init(username, password, account_id, **kwargs):
     """
@@ -191,9 +193,9 @@ def create_server(nickname, create_server_parameters=None):
     for key, value in create_server_parameters.items():
         create_data['server[%s]' % key] = value
     response = _request('/servers', method='POST', body=urlencode(create_data))
-
     location = response.headers.get('location')
-    _debug('Created %s: %s (%s:%s)' % (nickname, location, response.status_code, response.content))
+    debug('Created %s: %s (%s:%s)' % (nickname, location, response.status_code, response.content))
+    # TODO: error responses
     return location
 
 def set_server_parameters(server_href, parameters):
