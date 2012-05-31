@@ -1,4 +1,5 @@
 import os
+import sys
 from pprint import pformat
 from datetime import datetime
 from optparse import OptionParser, TitledHelpFormatter
@@ -9,6 +10,8 @@ from clint.textui import columns
 from righteous import api
 from righteous.util import comma_split, read_authentication, cache_authentication
 
+import logging
+log = logging.getLogger('tty') if sys.stdin.isatty() else logging.getLogger()
 
 AUTH_FILE = os.path.expanduser('~/.righteous')
 COL = 30
@@ -47,6 +50,7 @@ def print_running_servers(servers, exclude_states=['stopped']):
 
 
 def main():
+
     parser = OptionParser(formatter=TitledHelpFormatter(width=78))
     parser.add_option('-l', '--list', dest='list_servers', action='store_true', help='List running integration environments')
 
@@ -67,6 +71,9 @@ def main():
     parser.add_option('-a', '--account-id', dest='account_id', type='string', help='The account_id of your RightScale account')
 
     (options, args) = parser.parse_args()
+
+    if options.debug:
+        logging.basicConfig(level=logging.DEBUG)
 
     config = read_authentication(AUTH_FILE)
 
@@ -96,16 +103,15 @@ def main():
 
     elif options.envname and options.email:
         server_template_parameters = dict(envname=options.envname, email=options.email, mode='unattended', branches=options.branches if options.branches else 'none')
-
-        response, content = api.create_and_start_server(options.envname, server_template_parameters)
-        if response['status']=='201':
-            puts(colored.green('Created and started environment %s @ %s' % (options.envname, response['location'])))
+        success, location = api.create_and_start_server(options.envname, server_template_parameters=server_template_parameters)
+        if success:
+            puts(colored.green('Created and started environment %s @ %s' % (options.envname, location)))
         else:
-            print response, content
+            puts(colored.red('Error creating environment %s' % options.envname))
 
     elif options.kill_env:
         for env in options.kill_env:
-            answer = raw_input('Confirm decommission of %s [Y/n]' % env)
+            answer = raw_input('Confirm decommission of %s [Y/n] ' % env)
             if answer in ['n', 'no']:
                 continue
             server = api.find_server(env)
@@ -116,6 +122,14 @@ def main():
                 puts_err(colored.magenta('Error stopping server %s @ %s' % (env, server['href'])))
 
     elif options.server_status:
+
+        puts(columns(
+            [(colored.green('Nickname')), 15],
+            [(colored.green('Instance Type')), 10],
+            [(colored.green('Status')), 20],
+            [(colored.green('Instance href')), 60],
+        ))
+
         for env in options.server_status:
             server = api.find_server(env)
             settings = api.server_settings(server['href'])
@@ -125,15 +139,9 @@ def main():
                 puts(colored.cyan(pformat(settings)))
 
             puts(columns(
-                [(colored.green('Nickname')), 15],
-                [(colored.green('Instance Type')), 10],
-                [(colored.green('Status')), 15],
-                [(colored.green('Instance href')), 60],
-            ))
-            puts(columns(
                 [env, 15],
                 [settings['ec2-instance-type'], 10],
-                [server['state'] if server else 'Found', 15],
+                [server['state'] if server else 'Found', 20],
                 [server['href'] if server else 'Not', 60],
 
             ))
