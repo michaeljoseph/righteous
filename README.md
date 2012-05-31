@@ -22,8 +22,9 @@ First, initialise righteous (to access read-only functionality, you just need to
 ```python
 import righteous
 username, password = 'me@domain.com', 'security'
-# find your RightScale account_id by
-account_id = 123
+# find your RightScale account_id by going to Settings -> Account Settings in the RightScale Dashboard
+# The URL that is shown in your browser's location bar should look like the following: https://my.rightscale.com/accounts/1234.
+account_id = 1234
 righteous.init(username, password, account_id)
 
 # list servers
