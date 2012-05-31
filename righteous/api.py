@@ -19,10 +19,10 @@ log = getLogger(__name__)
 
 ACCOUNT_URL = 'https://my.rightscale.com/api/acct/'
 
-def debug(message):
-    log.debug(message)
+def debug(message, *args):
+    log.debug(message, *args)
     if config.settings.debug:
-        config.settings.debug.write('%s\n' % message)
+        config.settings.debug.write('%s\n' % (message % args))
 
 def _build_headers(headers=None):
     request_headers = {'X-API-VERSION': '1.0'}
