@@ -26,9 +26,9 @@ class RighteousTestCase(TestCase):
         self.env = 'env-%s' % uuid4().hex
         self.username = self.auth['username']
 
-    def _create_server(self):
+    def _create_server(self, instance_type='m1.small'):
         parameters = dict(envname=self.env, email=self.username, mode='unattended', branches='none')
-        successful, location = righteous.create_and_start_server(self.env, server_template_parameters=parameters)
+        successful, location = righteous.create_and_start_server(self.env, instance_type, server_template_parameters=parameters)
         assert successful
         assert location is not None
         if self.delete_server:
@@ -52,7 +52,7 @@ class RighteousTestCase(TestCase):
         assert_equal(server['state'], 'pending')
 
     def test_create_server(self):
-        location = righteous.create_server(self.env)
+        location = righteous.create_server(self.env, 'm1.small')
         assert_not_equal(location, None)
         self.envs.append(self.env)
 

@@ -179,19 +179,27 @@ def delete_server(server_href, nickname=None):
     """
     return _request(_lookup_server(server_href, nickname), method='DELETE', prepend_api_base=False).status_code == 200
 
-def create_server(nickname, create_server_parameters=None):
+def create_server(nickname, instance_type, create_server_parameters=None):
     """
     Create a server.
 
     :param nickname: String representing the nickname of the server
+    :param instance_type: String of the ec2 instance type
     :param create_server_parameters: (optional) Dictionary of server creation parameters
     """
     if not create_server_parameters:
         create_server_parameters = config.settings.create_server_parameters
 
     create_data = {'server[nickname]' : nickname}
+
+    # TODO: error if no instance type key exists
+    instance_server_href = create_server_parameters[instance_type]
+    create_server_parameters = dict((k,v) for k,v in create_server_parameters.items() if not k.startswith('m1'))
+
     for key, value in create_server_parameters.items():
         create_data['server[%s]' % key] = value
+    create_data['server[server_template_href]'] = instance_server_href
+
     response = _request('/servers', method='POST', body=urlencode(create_data))
     location = response.headers.get('location')
     debug('Created %s: %s (%s:%s)' % (nickname, location, response.status_code, response.content))
@@ -211,15 +219,16 @@ def set_server_parameters(server_href, parameters):
     update = '&'.join(input_data)
     return _request(server_href, method='PUT', body=update, headers={'Content-Type': 'application/x-www-form-urlencoded'}, prepend_api_base=False)
 
-def create_and_start_server(nickname, create_server_parameters=None, server_template_parameters=None):
+def create_and_start_server(nickname, instance_type, create_server_parameters=None, server_template_parameters=None):
     """Creates and starts a server.
     Returns a tuple of operation status, href of the created, started server
 
     :param nickname: String representing the nickname of the server
+    :param instance_type: String of the ec2 instance type
     :param create_server_parameters: (optional) Dictionary of server creation parameters
     :param server_template_parameters: (optional) Dictionary of ServerTemplate parameters
     """
-    server_href = create_server(nickname, create_server_parameters)
+    server_href = create_server(nickname, instance_type, create_server_parameters)
 
     if server_href:
         if server_template_parameters:

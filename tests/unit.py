@@ -1,6 +1,7 @@
 import sys
 import base64
 from testify import *
+from urllib import urlencode
 import requests
 import righteous
 from righteous import config
@@ -90,3 +91,21 @@ class RighteousUnitTestCase(TestCase):
         mock_request = flexmock(righteous.api)
         mock_request.should_receive('_request').with_args(server_href, method='PUT', body=expected, headers={'Content-Type': 'application/x-www-form-urlencoded'}, prepend_api_base=False)
         righteous.api.set_server_parameters(server_href, parameters)
+
+    def test_create_server(self):
+        nickname = 'foo'
+        create_server_parameters = {
+            'server_template_href': 'https://my.rightscale.com/api/acct/281/ec2_server_templates/52271',
+            'm1.small': 'https://my.rightscale.com/api/acct/281/ec2_server_templates/52271',
+            'm1.large': 'https://my.rightscale.com/api/acct/281/ec2_server_templates/122880',
+        }
+        create_data = {
+            'server[nickname]' : nickname,
+            'server[server_template_href]': create_server_parameters['m1.large']
+        }
+        expected = urlencode(create_data)
+        mock_request = flexmock(righteous.api)
+        mock_request.should_receive('_request').with_args('/servers', method='POST', body=expected).and_return(flexmock(status_code=200, content='Something', headers={'location':'/server'}))
+
+        righteous.api.create_server(nickname, 'm1.large', create_server_parameters=create_server_parameters)
+

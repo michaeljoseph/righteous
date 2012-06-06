@@ -103,7 +103,7 @@ def main():
 
     elif options.envname and options.email:
         server_template_parameters = dict(envname=options.envname, email=options.email, mode='unattended', branches=options.branches if options.branches else 'none')
-        success, location = api.create_and_start_server(options.envname, server_template_parameters=server_template_parameters)
+        success, location = api.create_and_start_server(options.envname, options.instance_type or 'm1.small', server_template_parameters=server_template_parameters)
         if success:
             puts(colored.green('Created and started environment %s @ %s' % (options.envname, location)))
         else:
