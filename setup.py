@@ -13,22 +13,16 @@ if sys.argv[-1] == "publish":
     os.system("python setup.py sdist upload")
     sys.exit()
 
-if sys.argv[-1] == "test":
-    os.system("python test_righteous.py")
-    sys.exit()
-
 required = [
-    'requests==0.6.4', 'clint',
+    'requests==0.10.8', 'clint==0.3.1', 'omnijson==0.1.2'
 ]
-
-if sys.version_info[:2] < (2,6):
-    required.append('simplejson')
 
 setup(
     name='righteous',
-    version='0.0.1',
+    version='0.1.0',
     description='Python RightScale API client.',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read() + '\n\n' +
+                     open('HISTORY.md').read(),
     author='Michael Joseph',
     author_email='michaeljoseph@gmail.com',
     url='https://github.com/michaeljoseph/righteous',
@@ -36,14 +30,19 @@ setup(
         'righteous',
     ],
     install_requires=required,
+    entry_points = {
+        'console_scripts': [
+            'righteous = righteous.cli:main',
+        ],
+    },
     classifiers=(
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'License :: OSI Approved :: ISC License (ISCL)', # ??
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.5',
         'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
     ),
 )
 

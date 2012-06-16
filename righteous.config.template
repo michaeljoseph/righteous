@@ -1,0 +1,15 @@
+[auth]
+username: username@domain.com
+password: password
+account_id: 123
+
+[server-defaults]
+default_deployment_id: 45623
+ec2_security_groups_href: https://my.rightscale.com/api/acct/123/ec2_security_groups/789
+ec2_availability_zone: us-east-1a
+ec2_ssh_key_href: https://my.rightscale.com/api/acct/123/ec2_ssh_keys/998
+cloud_id: 1
+server_template_href: https://my.rightscale.com/api/acct/123/ec2_server_templates/74732
+instance_type: m1.small
+m1.small: https://my.rightscale.com/api/acct/123/ec2_server_templates/74732
+m1.large: https://my.rightscale.com/api/acct/123/ec2_server_templates/117240
