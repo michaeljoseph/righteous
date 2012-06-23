@@ -19,7 +19,7 @@ required = [
 
 setup(
     name='righteous',
-    version='0.1.0',
+    version='0.1.1',
     description='Python RightScale API client.',
     long_description=open('README.md').read() + '\n\n' +
                      open('HISTORY.md').read(),
