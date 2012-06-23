@@ -156,6 +156,9 @@ def main():
                 puts_err(colored.magenta('Error deleting %s @ %s' % (env, server['href'])))
     else:
         parser.print_help()
-
+"""
+https://bitbucket.org/mchaput/baker/wiki/Home
+https://github.com/kennethreitz/legit/blob/develop/legit/cli.py
+"""
 if __name__ == '__main__':
     main()
