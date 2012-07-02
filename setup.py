@@ -14,7 +14,8 @@ if sys.argv[-1] == "publish":
     sys.exit()
 
 required = [
-    'requests==0.10.8', 'clint==0.3.1', 'omnijson==0.1.2'
+    'requests==0.10.8', 'clint==0.3.1', 
+    'omnijson==0.1.2', 'docopt==0.4.1',
 ]
 
 setup(
