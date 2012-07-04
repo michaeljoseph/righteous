@@ -3,6 +3,7 @@
 
 import os
 import sys
+import righteous
 
 try:
     from setuptools import setup
@@ -20,7 +21,7 @@ required = [
 
 setup(
     name='righteous',
-    version='0.1.1',
+    version=righteous.__version__,
     description='Python RightScale API client.',
     long_description=open('README.md').read() + '\n\n' +
                      open('HISTORY.md').read(),
