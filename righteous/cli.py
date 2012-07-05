@@ -24,8 +24,7 @@ from optparse import OptionParser, TitledHelpFormatter
 from clint.textui import puts, colored, puts_err
 from clint.textui import columns
 
-from righteous import api
-from righteous.util import comma_split, read_authentication, cache_authentication
+import righteous
 
 import logging
 log = logging.getLogger('tty') if sys.stdin.isatty() else logging.getLogger()
@@ -44,8 +43,8 @@ def print_running_servers(servers, exclude_states=['stopped']):
     now = datetime.now()
     output = []
     for server in servers['servers']:
-        server_info = api.server_info(server['href'])
-        server_settings = api.server_settings(server['href'])
+        server_info = righteous.server_info(server['href'])
+        server_settings = righteous.server_settings(server['href'])
         owner = server_owner(server_info)
         running = now - datetime.strptime(server['created_at'], '%Y/%m/%d %H:%M:%S +0000')
         if server['state'] not in exclude_states:
@@ -71,11 +70,11 @@ def main():
     parser = OptionParser(formatter=TitledHelpFormatter(width=78))
     parser.add_option('-l', '--list', dest='list_servers', action='store_true', help='List running integration environments')
 
-    parser.add_option('-k', '--kill', dest='kill_env', type='string', help='Stops a comma-separated list of integration environments', action='callback', callback=comma_split)
+    parser.add_option('-k', '--kill', dest='kill_env', type='string', help='Stops a comma-separated list of integration environments', action='callback', callback=righteous.util.comma_split)
 
-    parser.add_option('-s', '--status', dest='server_status', type='string', help='Lists the status of a comma-separated list of integration environments', action='callback', callback=comma_split)
+    parser.add_option('-s', '--status', dest='server_status', type='string', help='Lists the status of a comma-separated list of integration environments', action='callback', callback=righteous.util.comma_split)
 
-    parser.add_option('-r', '--remove', dest='delete_env', type='string', help='Deletes a comma-separated list of integration environments', action='callback', callback=comma_split)
+    parser.add_option('-r', '--remove', dest='delete_env', type='string', help='Deletes a comma-separated list of integration environments', action='callback', callback=righteous.util.comma_split)
 
     parser.add_option('-c', '--create', dest='envname', type='string', help='Create an integration environment')
     parser.add_option('-b', '--branches', dest='branches', type='string', help='Branches to build')
@@ -92,7 +91,7 @@ def main():
     if options.debug:
         logging.basicConfig(level=logging.DEBUG)
 
-    config = read_authentication(AUTH_FILE)
+    config = righteous.util.read_authentication(AUTH_FILE)
 
     if (options.username and options.password and options.account_id):
         username, password, account_id = options.username, options.password, options.account_id
@@ -100,11 +99,11 @@ def main():
         username, password, account_id = tuple(config.get('auth', key) for key in config.options('auth'))
 
     server_parameters = dict(config.items('server-defaults'))
-    api.init(username, password, account_id, **server_parameters)
+    righteous.init(username, password, account_id, **server_parameters)
 
     if username:
-        if api.login():
-            cache_authentication(username, password, account_id, AUTH_FILE)
+        if righteous.login():
+            righteous.util.cache_authentication(username, password, account_id, AUTH_FILE)
         else:
             puts_err(colored.red('Authentication failed'))
             exit(2)
@@ -115,12 +114,12 @@ def main():
         exit(2)
 
     if options.list_servers:
-        servers = api.list_servers()
+        servers = righteous.list_servers()
         print_running_servers(servers, exclude_states=[])
 
     elif options.envname and options.email:
         server_template_parameters = dict(envname=options.envname, email=options.email, mode='unattended', branches=options.branches if options.branches else 'none')
-        success, location = api.create_and_start_server(options.envname, options.instance_type or 'm1.small', server_template_parameters=server_template_parameters)
+        success, location = righteous.create_and_start_server(options.envname, options.instance_type or 'm1.small', server_template_parameters=server_template_parameters)
         if success:
             puts(colored.green('Created and started environment %s @ %s' % (options.envname, location)))
         else:
@@ -131,8 +130,8 @@ def main():
             answer = raw_input('Confirm decommission of %s [Y/n] ' % env)
             if answer in ['n', 'no']:
                 continue
-            server = api.find_server(env)
-            success = api.stop_server(server['href'])
+            server = righteous.find_server(env)
+            success = righteous.stop_server(server['href'])
             if success:
                 puts(colored.cyan('Initiated decommission of %s @ %s' % (env, server['href'])))
             else:
@@ -148,10 +147,10 @@ def main():
         ))
 
         for env in options.server_status:
-            server = api.find_server(env)
-            settings = api.server_settings(server['href'])
+            server = righteous.find_server(env)
+            settings = righteous.server_settings(server['href'])
             if server and options.debug:
-                server_info = api.server_info(server['href'])
+                server_info = righteous.server_info(server['href'])
                 puts(colored.cyan(pformat(server_info)))
                 puts(colored.cyan(pformat(settings)))
 
@@ -165,8 +164,8 @@ def main():
 
     elif options.delete_env:
         for env in options.delete_env:
-            server = api.find_server(env)
-            success = api.delete_server(server['href'])
+            server = righteous.find_server(env)
+            success = righteous.delete_server(server['href'])
             if success:
                 puts(colored.green('Successfully deleted %s @ %s' % (env, server['href'])))
             else:
