@@ -2,9 +2,9 @@
 Righteous CLI.
 
 Usage:
-  righteous [options] list-servers
+  righteous [options] list
   righteous [options] create <environment> <email> <instance_type>
-  righteous [options] kill <environment>...
+  righteous [options] stop <environment>...
   righteous [options] status <environment>...
   righteous [options] delete <environment>...
   righteous --version
@@ -173,7 +173,27 @@ def main():
     else:
         parser.print_help()
 
+def list():
+    print 'IN LIST'
+
+def create():
+    print 'creating'
+
+def stop():
+    print 'stopping'
+
+def delete():
+    print 'deleting'
+
+def status():
+    print 'status'
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='righteous cli')
     print(arguments)
+
+    command_list = ['list', 'create', 'stop', 'delete', 'status']
+
+    for command in command_list:
+        if arguments[command]:
+            locals()[command]()
