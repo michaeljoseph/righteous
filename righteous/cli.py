@@ -25,6 +25,7 @@ from clint.textui import puts, colored, puts_err
 from clint.textui import columns
 
 import righteous
+from righteous.util import read_authentication, cache_authentication
 
 import logging
 log = logging.getLogger('tty') if sys.stdin.isatty() else logging.getLogger()
@@ -173,8 +174,33 @@ def main():
     else:
         parser.print_help()
 
-def list():
-    print 'IN LIST'
+def initialise(arguments):
+    verbose = arguments['--verbose']
+    config_file = arguments['--config']
+
+    if verbose:
+        logging.basicConfig(level=logging.DEBUG)
+
+    config = read_authentication(config_file or AUTH_FILE)
+    if not config:
+        # TODO: prompt for config and store
+        pass
+
+    username, password, account_id = tuple(config.get('auth', key) for key in config.options('auth'))
+
+    server_parameters = dict(config.items('server-defaults'))
+    righteous.init(username, password, account_id, **server_parameters)
+
+    if righteous.login():
+        cache_authentication(username, password, account_id, config_file or AUTH_FILE)
+    else:
+        puts_err(colored.red('Authentication failed'))
+        exit(2)
+
+def list(arguments):
+    initialise(arguments)
+    servers = righteous.list_servers()
+    print_running_servers(servers, exclude_states=[])
 
 def create():
     print 'creating'
@@ -190,10 +216,7 @@ def status():
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='righteous cli')
-    print(arguments)
 
-    command_list = ['list', 'create', 'stop', 'delete', 'status']
-
-    for command in command_list:
+    for command in ['list', 'create', 'stop', 'delete', 'status']:
         if arguments[command]:
-            locals()[command]()
+            locals()[command](arguments)
