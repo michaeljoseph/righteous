@@ -1,3 +1,20 @@
+"""
+Righteous CLI.
+
+Usage:
+  righteous [options] list-servers
+  righteous [options] create <environment> <email> <instance_type>
+  righteous [options] kill <environment>...
+  righteous [options] status <environment>...
+  righteous [options] delete <environment>...
+  righteous --version
+
+Options:
+  -c FILE --config=FILE        Specify the configuration file location, default is ~/.righteous
+  -v --verbose                 Show debug output          
+  -h --help                    Show this screen.
+"""
+from docopt import docopt
 import os
 import sys
 from pprint import pformat
@@ -156,9 +173,8 @@ def main():
                 puts_err(colored.magenta('Error deleting %s @ %s' % (env, server['href'])))
     else:
         parser.print_help()
-"""
-https://bitbucket.org/mchaput/baker/wiki/Home
-https://github.com/kennethreitz/legit/blob/develop/legit/cli.py
-"""
+
+
 if __name__ == '__main__':
-    main()
+    arguments = docopt(__doc__, version='righteous cli')
+    print(arguments)
