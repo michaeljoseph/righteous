@@ -10,7 +10,7 @@ install:
 
 before_script:
   - pep8 righteous
-  - pyflakes righteous
+  - pyflakes docs righteous tests setup.py
 
 script:
   - testify tests.unit
