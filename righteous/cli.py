@@ -207,17 +207,29 @@ def list(arguments):
 def create():
     print 'creating'
 
-def stop():
-    print 'stopping'
+def stop(arguments):
+    initialise(arguments)
+
+    for environment in arguments['<environment>']:
+        answer = raw_input('Confirm decommission of %s [Y/n] ' % environment)
+        if answer in ['n', 'no']:
+            continue
+
+        server = righteous.find_server(environment)
+        success = righteous.stop_server(server['href'])
+        if success:
+            puts(colored.cyan('Initiated decommission of %s @ %s' % (environment, server['href'])))
+        else:
+            puts_err(colored.magenta('Error stopping server %s @ %s' % (environment, server['href'])))
 
 def delete():
     print 'deleting'
 
 def status(arguments):
     verbose = initialise(arguments)
-    envs = arguments['<environment>']
+    environments = arguments['<environment>']
 
-    if envs:
+    if environments:
         puts(columns(
             [(colored.green('Nickname')), 15],
             [(colored.green('Instance Type')), 10],
@@ -225,8 +237,8 @@ def status(arguments):
             [(colored.green('Instance href')), 60],
         ))
 
-    for env in envs:
-        server = righteous.find_server(env)
+    for environment in environments:
+        server = righteous.find_server(environment)
         settings = righteous.server_settings(server['href'])
         if server and verbose:
             server_info = righteous.server_info(server['href'])
@@ -234,7 +246,7 @@ def status(arguments):
             puts(colored.cyan(pformat(settings)))
 
         puts(columns(
-            [env, 15],
+            [environment, 15],
             [settings['ec2-instance-type'], 10],
             [server['state'] if server else 'Found', 20],
             [server['href'] if server else 'Not', 60],
