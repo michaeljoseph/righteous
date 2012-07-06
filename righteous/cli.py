@@ -197,6 +197,8 @@ def initialise(arguments):
         puts_err(colored.red('Authentication failed'))
         exit(2)
 
+    return verbose
+
 def list(arguments):
     initialise(arguments)
     servers = righteous.list_servers()
@@ -211,8 +213,33 @@ def stop():
 def delete():
     print 'deleting'
 
-def status():
-    print 'status'
+def status(arguments):
+    verbose = initialise(arguments)
+    envs = arguments['<environment>']
+
+    if envs:
+        puts(columns(
+            [(colored.green('Nickname')), 15],
+            [(colored.green('Instance Type')), 10],
+            [(colored.green('Status')), 20],
+            [(colored.green('Instance href')), 60],
+        ))
+
+    for env in envs:
+        server = righteous.find_server(env)
+        settings = righteous.server_settings(server['href'])
+        if server and verbose:
+            server_info = righteous.server_info(server['href'])
+            puts(colored.cyan(pformat(server_info)))
+            puts(colored.cyan(pformat(settings)))
+
+        puts(columns(
+            [env, 15],
+            [settings['ec2-instance-type'], 10],
+            [server['state'] if server else 'Found', 20],
+            [server['href'] if server else 'Not', 60],
+
+        ))
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='righteous cli')
