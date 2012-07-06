@@ -8,9 +8,9 @@ python:
 install:
   - pip install -r requirements.txt --use-mirrors
 
-before_script:
-  - pep8 righteous
-  - pyflakes docs righteous tests setup.py
+#before_script:
+#  - pep8 righteous
+#  - pyflakes docs righteous tests setup.py
 
 script:
   - testify tests.unit
