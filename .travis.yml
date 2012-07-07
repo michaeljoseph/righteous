@@ -13,4 +13,7 @@ install:
 #  - pyflakes docs righteous tests setup.py
 
 script:
-  - testify tests.unit
+  - testify -c tests.unit
+
+after_script:
+  - COVERAGE_FILE=coverage_file..tests.unit.RighteousUnitTestCase coverage html
