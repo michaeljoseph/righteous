@@ -269,7 +269,7 @@ def status(arguments):
     print output.getvalue()
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__, version='righteous cli')
+    arguments = docopt(__doc__, version=righteous.__version__)
 
     for command in ['list', 'create', 'stop', 'delete', 'status']:
         if arguments[command]:
