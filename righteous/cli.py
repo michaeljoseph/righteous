@@ -19,6 +19,7 @@ import os
 import sys
 from pprint import pformat
 from datetime import datetime
+from StringIO import StringIO
 from optparse import OptionParser, TitledHelpFormatter
 
 from clint.textui import puts, colored, puts_err
@@ -34,37 +35,37 @@ AUTH_FILE = os.path.expanduser('~/.righteous')
 COL = 30
 
 def print_running_servers(servers, exclude_states=['stopped']):
+    output = StringIO()
     def server_owner(server_info):
-        owner = None
-        for p in server_info['parameters']:
-            if p['name']=='EMAIL':
-                owner = p['value'][5:]
-        return owner
+        owner = [p['value'][5:] for p in server_info['parameters'] if p['name']=='EMAIL']
+        return owner[0] if len(owner) else None
 
     now = datetime.now()
-    output = []
+    server_list = []
     for server in servers['servers']:
         server_info = righteous.server_info(server['href'])
         server_settings = righteous.server_settings(server['href'])
         owner = server_owner(server_info)
         running = now - datetime.strptime(server['created_at'], '%Y/%m/%d %H:%M:%S +0000')
         if server['state'] not in exclude_states:
-            output.append(dict(days=running.days, instance=server['nickname'], size=server_settings['ec2-instance-type'], creator=owner))
+            server_list.append(dict(days=running.days, instance=server['nickname'], size=server_settings['ec2-instance-type'], creator=owner))
 
     puts(columns(
         [(colored.red('Instance')), COL],
         [(colored.green('Size')), COL],
         [(colored.magenta('Creator')), COL],
         [(colored.cyan('Running days')), COL],
-    ))
-    for line in sorted(output, key=lambda d: (d['days'])):
+    ), stream=output.write)
+
+    for line in sorted(server_list, key=lambda d: d['days']):
         puts(columns(
             [line['instance'], COL],
             [line['size'], COL],
             [line['creator'], COL],
             [str(line['days']), COL],
-        ))
-
+        ), stream=output.write)
+    
+    print output.getvalue()
 
 def main():
 
@@ -233,6 +234,7 @@ def delete(arguments):
             puts_err(colored.magenta('Error deleting %s @ %s' % (environment, server['href'])))
 
 def status(arguments):
+    output = StringIO()
     verbose = initialise(arguments)
     environments = arguments['<environment>']
 
@@ -242,23 +244,29 @@ def status(arguments):
             [(colored.green('Instance Type')), 10],
             [(colored.green('Status')), 20],
             [(colored.green('Instance href')), 60],
-        ))
+        ), stream=output.write)
 
     for environment in environments:
         server = righteous.find_server(environment)
-        settings = righteous.server_settings(server['href'])
-        if server and verbose:
-            server_info = righteous.server_info(server['href'])
-            puts(colored.cyan(pformat(server_info)))
-            puts(colored.cyan(pformat(settings)))
+        if server:
+            settings = righteous.server_settings(server['href'])
+            if verbose:
+                server_info = righteous.server_info(server['href'])
+                puts('Server Info:\n' + colored.cyan(pformat(server_info)))
+                puts('Server Settings:\n' + colored.cyan(pformat(settings)))
 
-        puts(columns(
-            [environment, 15],
-            [settings['ec2-instance-type'], 10],
-            [server['state'] if server else 'Found', 20],
-            [server['href'] if server else 'Not', 60],
+            puts(columns(
+                [environment, 15],
+                [settings['ec2-instance-type'], 10],
+                [server['state'] if server else 'Found', 20],
+                [server['href'] if server else 'Not', 60],
 
-        ))
+            ), stream=output.write)
+        else:
+            puts(colored.red('%s: Not Found' % environment), 
+                    stream=output.write)
+
+    print output.getvalue()
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='righteous cli')
