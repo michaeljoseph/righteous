@@ -10,9 +10,14 @@ http://support.rightscale.com/15-References/RightScale_API_Reference_Guide/02-Ma
 
 from . import config
 import sys, base64
-import requests
+# HACK: to allow setup.py to import __version__ from righteous/__init__.py
+try:
+    import requests
+    import omnijson as json
+except ImportError:
+    pass
 from urllib import urlencode
-import omnijson as json
+
 
 from logging import getLogger
 log = getLogger(__name__)
