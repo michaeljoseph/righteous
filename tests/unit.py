@@ -1,5 +1,6 @@
 import sys
 import base64
+# FIXME
 from testify import *
 from urllib import urlencode
 import requests
@@ -26,6 +27,7 @@ class RighteousUnitTestCase(TestCase):
         assert_equal(_build_headers(headers), {'X-API-VERSION': '1.0', 'baz': 'bar', 'Cookie': 'cookie_value'})
 
     def test_a_request(self):
+        # FIXME: lose test name ordering and fix setup / teardown test isolation
         username, password, account_id = 'user', 'pass', 'account_id'
         righteous.init(username, password, account_id)
         mock_request = flexmock(requests)
@@ -34,6 +36,7 @@ class RighteousUnitTestCase(TestCase):
         righteous.api._request('/test')
 
     def test_aa_request_no_prepend(self):
+        # FIXME: lose test name ordering and fix setup / teardown test isolation
         username, password, account_id = 'user', 'pass', 'account_id'
         righteous.init(username, password, account_id)
         mock_request = flexmock(requests)
@@ -55,6 +58,7 @@ class RighteousUnitTestCase(TestCase):
         assert_equal(righteous.config.settings.create_server_parameters['foo'], 'bar')
 
     def test_a_login(self):
+        # FIXME: lose test name ordering and fix setup / teardown test isolation
         assert_raises(Exception, righteous.login)
 
     def test_login_with_init_credentials(self):
@@ -68,6 +72,7 @@ class RighteousUnitTestCase(TestCase):
         righteous.login()
 
     def test_b_login_with_credentials(self):
+        # FIXME: lose test name ordering and fix setup / teardown test isolation
         username, password, account_id = 'foo', 'bar', '123'
         mock_request = flexmock(righteous.api)
         mock_response = flexmock(status_code=204, headers={'set-cookie': 'foo'})
@@ -109,3 +114,6 @@ class RighteousUnitTestCase(TestCase):
 
         righteous.api.create_server(nickname, 'm1.large', create_server_parameters=create_server_parameters)
 
+    # TODO
+    def test_create_and_start_server(self):
+        pass
