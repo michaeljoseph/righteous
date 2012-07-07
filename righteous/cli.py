@@ -3,7 +3,7 @@ Righteous CLI.
 
 Usage:
   righteous [options] list
-  righteous [options] create <environment> <email> <instance_type>
+  righteous [options] create <environment> <instance-type> (<server-template-key>=<server-template-value>)...
   righteous [options] stop <environment>...
   righteous [options] status <environment>...
   righteous [options] delete <environment>...
@@ -205,8 +205,21 @@ def list(arguments):
     servers = righteous.list_servers()
     print_running_servers(servers, exclude_states=[])
 
-def create():
-    print 'creating'
+def create(arguments):
+    initialise(arguments)
+    
+    server_template_parameters = {}
+    for argument in arguments['<server-template-key>=<server-template-value>']:
+        param, value = argument.split('=')
+        server_template_parameters[param] = value
+
+    success, location = righteous.create_and_start_server(arguments['<environment>'][0],
+            arguments['<instance-type>'] or 'm1.small', 
+            server_template_parameters=server_template_parameters)
+    if success:
+        puts(colored.green('Created and started environment %s @ %s' % (arguments['<environment>'][0], location)))
+    else:
+        puts(colored.red('Error creating environment %s' % arguments['<environment>'][0]))
 
 def stop(arguments):
     initialise(arguments)
