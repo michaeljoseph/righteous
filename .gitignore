@@ -1,7 +1,7 @@
 MANIFEST
 coverage.xml
-nosetests.xml
-pylint.txt
+pep8.report
+pyflakes.report
 *.pyc
 docs/_build
 .gitignore
@@ -9,3 +9,5 @@ righteous.config
 righteous.egg-info
 .tox
 dist
+htmlcov/
+coverage_file..tests.unit.RighteousUnitTestCase
