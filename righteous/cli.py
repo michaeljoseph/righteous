@@ -222,8 +222,15 @@ def stop(arguments):
         else:
             puts_err(colored.magenta('Error stopping server %s @ %s' % (environment, server['href'])))
 
-def delete():
-    print 'deleting'
+def delete(arguments):
+    initialise(arguments)
+    for environment in arguments['<environment>']:
+        server = righteous.find_server(environment)
+        success = righteous.delete_server(server['href'])
+        if success:
+            puts(colored.green('Successfully deleted %s @ %s' % (environment, server['href'])))
+        else:
+            puts_err(colored.magenta('Error deleting %s @ %s' % (environment, server['href'])))
 
 def status(arguments):
     verbose = initialise(arguments)
