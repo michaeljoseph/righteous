@@ -109,6 +109,7 @@ def login(username=None, password=None, account_id=None):
         config.settings.username = username
         config.settings.password = password
         return True
+
     return False
 
 
@@ -152,7 +153,11 @@ def _lookup_server(server_href, nickname):
     if server_href:
         return server_href
     elif nickname:
-        return find_server(nickname)['href']
+        server = find_server(nickname)
+        if server and 'href' in server:
+            return server['href']
+        else:
+            raise Exception('No environment named %s found' % nickname)
 
 
 def server_info(server_href, nickname=None):
