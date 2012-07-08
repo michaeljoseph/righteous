@@ -3,15 +3,16 @@ righteous! Interact with the RightScale Server API.
 
 Usage:
   righteous [options] list
-  righteous [options] create <environment> <instance-type> (<server-template-key>=<server-template-value>)...
+  righteous [options] create <environment> <instance-type>
+                             (<template-key>=<template-value>)...
   righteous [options] stop <environment>...
   righteous [options] status <environment>...
   righteous [options] delete <environment>...
   righteous --version
 
 Options:
-  -c FILE --config=FILE        Specify the configuration file location, default is ~/.righteous
-  -v --verbose                 Show debug output          
+  -c FILE --config=FILE        Configuration file path, ~/.righteous default
+  -v --verbose                 Show debug output.
   -h --help                    Show this screen.
 """
 from docopt import docopt
@@ -33,21 +34,28 @@ log = logging.getLogger('tty') if sys.stdin.isatty() else logging.getLogger()
 AUTH_FILE = os.path.expanduser('~/.righteous')
 COL = 30
 
+
 def print_running_servers(servers, exclude_states=['stopped']):
-    output = StringIO()
+
     def server_owner(server_info):
-        owner = [p['value'][5:] for p in server_info['parameters'] if p['name']=='EMAIL']
+        owner = [p['value'][5:] for p in server_info['parameters']
+            if p['name'] == 'EMAIL']
         return owner[0] if len(owner) else None
 
+    output = StringIO()
     now = datetime.now()
     server_list = []
     for server in servers['servers']:
         server_info = righteous.server_info(server['href'])
         server_settings = righteous.server_settings(server['href'])
         owner = server_owner(server_info)
-        running = now - datetime.strptime(server['created_at'], '%Y/%m/%d %H:%M:%S +0000')
+        running = now - datetime.strptime(server['created_at'],
+            '%Y/%m/%d %H:%M:%S +0000')
         if server['state'] not in exclude_states:
-            server_list.append(dict(days=running.days, instance=server['nickname'], size=server_settings['ec2-instance-type'], creator=owner))
+            server_list.append(dict(days=running.days,
+                instance=server['nickname'],
+                size=server_settings['ec2-instance-type'],
+                creator=owner))
 
     puts(columns(
         [(colored.red('Instance')), COL],
@@ -63,8 +71,9 @@ def print_running_servers(servers, exclude_states=['stopped']):
             [line['creator'], COL],
             [str(line['days']), COL],
         ), stream=output.write)
-    
+
     print output.getvalue()
+
 
 def initialise(arguments):
     verbose = arguments['--verbose']
@@ -78,39 +87,47 @@ def initialise(arguments):
         # TODO: prompt for config and store
         pass
 
-    username, password, account_id = tuple(config.get('auth', key) for key in config.options('auth'))
+    username, password, account_id = tuple(config.get('auth', key)
+        for key in config.options('auth'))
 
     server_parameters = dict(config.items('server-defaults'))
     righteous.init(username, password, account_id, **server_parameters)
 
     if righteous.login():
-        cache_authentication(username, password, account_id, config_file or AUTH_FILE)
+        cache_authentication(username, password, account_id,
+            config_file or AUTH_FILE)
     else:
         puts_err(colored.red('Authentication failed'))
         exit(2)
 
     return verbose
 
+
 def list(arguments):
     initialise(arguments)
     servers = righteous.list_servers()
     print_running_servers(servers, exclude_states=[])
 
+
 def create(arguments):
     initialise(arguments)
-    
+
     server_template_parameters = {}
     for argument in arguments['<server-template-key>=<server-template-value>']:
         param, value = argument.split('=')
         server_template_parameters[param] = value
 
-    success, location = righteous.create_and_start_server(arguments['<environment>'][0],
-            arguments['<instance-type>'] or 'm1.small', 
-            server_template_parameters=server_template_parameters)
+    success, location = righteous.create_and_start_server(
+        arguments['<environment>'][0],
+        arguments['<instance-type>'] or 'm1.small',
+        server_template_parameters=server_template_parameters)
     if success:
-        puts(colored.green('Created and started environment %s @ %s' % (arguments['<environment>'][0], location)))
+        puts(colored.green('Created and started environment %s @ %s' %
+            (arguments['<environment>'][0], location)))
     else:
-        puts(colored.red('Error creating environment %s' % arguments['<environment>'][0]))
+        puts(colored.red('Error creating environment %s' %
+            arguments['<environment>'][0]))
+
 
 def stop(arguments):
     initialise(arguments)
@@ -123,9 +140,12 @@ def stop(arguments):
         server = righteous.find_server(environment)
         success = righteous.stop_server(server['href'])
         if success:
-            puts(colored.cyan('Initiated decommission of %s @ %s' % (environment, server['href'])))
+            puts(colored.cyan('Initiated decommission of %s @ %s' %
+                (environment, server['href'])))
         else:
-            puts_err(colored.magenta('Error stopping server %s @ %s' % (environment, server['href'])))
+            puts_err(colored.magenta('Error stopping server %s @ %s' %
+                (environment, server['href'])))
+
 
 def delete(arguments):
     initialise(arguments)
@@ -133,9 +153,12 @@ def delete(arguments):
         server = righteous.find_server(environment)
         success = righteous.delete_server(server['href'])
         if success:
-            puts(colored.green('Successfully deleted %s @ %s' % (environment, server['href'])))
+            puts(colored.green('Successfully deleted %s @ %s' %
+                (environment, server['href'])))
         else:
-            puts_err(colored.magenta('Error deleting %s @ %s' % (environment, server['href'])))
+            puts_err(colored.magenta('Error deleting %s @ %s' %
+                (environment, server['href'])))
+
 
 def status(arguments):
     output = StringIO()
@@ -167,10 +190,11 @@ def status(arguments):
 
             ), stream=output.write)
         else:
-            puts(colored.red('%s: Not Found' % environment), 
+            puts(colored.red('%s: Not Found' % environment),
                     stream=output.write)
 
     print output.getvalue()
+
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version=righteous.__version__)
