@@ -7,8 +7,10 @@ import righteous
 
 try:
     from setuptools import setup
+    hush_pyflakes = setup
 except ImportError:
     from distutils.core import setup
+   
 
 if sys.argv[-1] == "publish":
     os.system("python setup.py sdist upload")
