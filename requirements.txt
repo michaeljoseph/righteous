@@ -3,7 +3,7 @@ omnijson==0.1.2
 clint==0.3.1
 
 coverage==3.5.2
-flexmock==0.9.3
+mock==0.8.0
 testify==0.2.4
 tox==1.3
 
