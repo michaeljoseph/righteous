@@ -1,5 +1,6 @@
 from uuid import uuid4
-from testify import *
+from testify import (TestCase, assert_equal, assert_not_equal, class_setup,
+    class_teardown, setup, teardown)
 import righteous
 from ConfigParser import SafeConfigParser
 
