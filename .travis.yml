@@ -8,12 +8,10 @@ python:
 install:
   - pip install -r requirements.txt --use-mirrors
 
-#before_script:
-#  - pep8 righteous
-#  - pyflakes docs righteous tests setup.py
-
 script:
   - testify -c tests.unit
 
 after_script:
+  - pep8 righteous
+  - pyflakes docs righteous tests setup.py
   - COVERAGE_FILE=coverage_file..tests.unit.RighteousUnitTestCase coverage html
