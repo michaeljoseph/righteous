@@ -9,5 +9,5 @@ righteous.config
 righteous.egg-info
 .tox
 dist
+.coverage
 htmlcov/
-coverage_file..tests.unit.RighteousUnitTestCase
