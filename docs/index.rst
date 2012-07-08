@@ -6,7 +6,7 @@
 .. image:: ../resources/righteous.jpg
 
 righteous! : A Python Rightscale API/CLI
-=====================
+========================================
 
 Release v\ |release|
 
