@@ -1,5 +1,8 @@
 # History
 
+## 0.2.0 (2012-07-07)
+
+- Use [docopt](https://github.com/docopt/docopt) for a better CLI
 
 ## 0.1.1 (2012-06-24)
 
@@ -15,5 +18,3 @@
 ## 0.0.1 (2012-01-10)
 
 - First release
-
-

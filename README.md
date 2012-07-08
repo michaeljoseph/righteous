@@ -65,7 +65,7 @@ Stop an instance
 
 Remove an instance
 
-	$ righteous delete my-instance
+    $ righteous delete my-instance
 
 
 ### Development / Running the tests
