@@ -25,9 +25,14 @@ setup(
     name='righteous',
     version=righteous.__version__,
     description='Python RightScale API client.',
-    long_description=open('README.md').read() + '\n\n' +
-                     open('HISTORY.md').read(),
-    author='Michael Joseph',
+    long_description="""
+    **righteous!** is a Python client implementation of the `RightScale API <http://support.rightscale.com/15-References/RightScale_API_Reference_Guide>`_ for EC2 instance management.
+
+    Source Code: `https://github.com/michaeljoseph/righteous <https://github.com/michaeljoseph/righteous>`_
+
+    RTFD: `http://righteous.readthedocs.org <http://righteous.readthedocs.org>`_
+    """,
+    author=righteous.__author__,
     author_email='michaeljoseph@gmail.com',
     url='https://github.com/michaeljoseph/righteous',
     packages= [
