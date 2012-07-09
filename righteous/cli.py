@@ -197,9 +197,11 @@ def status(arguments):
     print output.getvalue()
 
 
-if __name__ == '__main__':
+def main():
     arguments = docopt(__doc__, version=righteous.__version__)
-
     for command in ['list', 'create', 'stop', 'delete', 'status']:
         if arguments[command]:
-            locals()[command](arguments)
+            globals()[command](arguments)
+
+if __name__ == '__main__':
+    main()
