@@ -1,6 +1,6 @@
-# righteous! : Python RightScale API client
+# righteous: Python RightScale API client
 
-**righteous!** is a Python client implementation of the [RightScale API](http://support.rightscale.com/15-References/RightScale_API_Reference_Guide) for EC2 instance management.
+**righteous** is a Python client implementation of the [RightScale API](http://support.rightscale.com/15-References/RightScale_API_Reference_Guide) for EC2 instance management.
 
 ![righteous](https://github.com/michaeljoseph/righteous/raw/master/resources/righteous.jpg)
 

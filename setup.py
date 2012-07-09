@@ -26,7 +26,7 @@ setup(
     version=righteous.__version__,
     description='Python RightScale API client.',
     long_description="""
-    **righteous!** is a Python client implementation of the `RightScale API <http://support.rightscale.com/15-References/RightScale_API_Reference_Guide>`_ for EC2 instance management.
+    **righteous** is a Python client implementation of the `RightScale API <http://support.rightscale.com/15-References/RightScale_API_Reference_Guide>`_ for EC2 instance management.
 
     Source Code: `https://github.com/michaeljoseph/righteous <https://github.com/michaeljoseph/righteous>`_
 

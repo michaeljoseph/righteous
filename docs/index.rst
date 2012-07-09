@@ -5,12 +5,12 @@
 
 .. image:: ../resources/righteous.jpg
 
-righteous! : A Python Rightscale API/CLI
-========================================
+righteous: A Python Rightscale API/CLI
+======================================
 
 Release v\ |release|
 
-**righteous!** is a Python client implementation of the `RightScale API <http://support.rightscale.com/15-References/RightScale_API_Reference_Guide>`_ for EC2 instance management.
+**righteous** is a Python client implementation of the `RightScale API <http://support.rightscale.com/15-References/RightScale_API_Reference_Guide>`_ for EC2 instance management.
 
 .. image:: https://secure.travis-ci.org/michaeljoseph/righteous.png
 
