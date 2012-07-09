@@ -1,5 +1,9 @@
 # History
 
+## 0.2.1 (2012-07-08)
+
+- Improve test coverage, pep8+pyflakes compliance
+
 ## 0.2.0 (2012-07-07)
 
 - Use [docopt](https://github.com/docopt/docopt) for a better CLI
