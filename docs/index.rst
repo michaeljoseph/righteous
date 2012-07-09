@@ -45,7 +45,8 @@ CLI
 
 ::
 
-  righteous! Interact with the RightScale Server API.
+  righteous
+  Interact with the RightScale Server API.
 
   Usage:
     righteous [options] list
