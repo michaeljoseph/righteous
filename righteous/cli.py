@@ -114,7 +114,7 @@ def create(arguments):
     initialise(arguments)
 
     server_template_parameters = {}
-    for argument in arguments['<server-template-key>=<server-template-value>']:
+    for argument in arguments['<template-key>=<template-value>']:
         param, value = argument.split('=')
         server_template_parameters[param] = value
 
