@@ -291,6 +291,9 @@ def create_and_start_server(nickname, instance_type,
         success = start_server_response.status_code == 201
         if success:
             location = start_server_response.headers['location']
+        else:
+            debug('Start server %s failed with %s' % (server_href,
+                start_server_response.content))
 
         return success, location
     else:
