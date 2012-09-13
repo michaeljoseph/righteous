@@ -5,7 +5,7 @@ from urllib import urlencode
 import requests
 import righteous
 from righteous import config
-from righteous.api import _build_headers
+from righteous.api import _build_headers, _extract_template_id
 from righteous.config import Settings
 from mock import Mock, patch
 import omnijson as json
@@ -36,6 +36,22 @@ class RighteousTestCase(TestCase):
         config.settings.password = None
         config.settings.account_id = None
         config.settings.requests_config = {}
+
+
+class ApiTestCase(RighteousTestCase):
+
+    @setup
+    def setup(self):
+        righteous.init('user', 'pass', 'account_id')
+
+
+class ExtractTemplateIdTestCase(ApiTestCase):
+
+    def test_ec2_template_href(self):
+        assert_equal(_extract_template_id('https://my.rightscale.com/api/acct/account_id/ec2_server_templates/12345'), '12345')
+
+    def test_unknown_ec2_template_href(self):
+        assert not _extract_template_id('https://my.rightscale.com/api/acct/account_id/rackspace_server_templates/12345')
 
 class BuildHeaderTestCase(RighteousTestCase):
 
@@ -131,11 +147,9 @@ class LoginTestCase(RighteousTestCase):
         self.request.assert_called_once_with('/login', headers={'Authorization': 'Basic %s' % auth})
 
 
-class ApiTestCase(RighteousTestCase):
 
-    @setup
-    def setup(self):
-        righteous.init('user', 'pass', 'account_id')
+
+class LookupServerTestCase(ApiTestCase):
 
     def test_lookup_server_unconfigured(self):
         assert_raises(ValueError, righteous.api._lookup_server, None, None)
@@ -152,6 +166,9 @@ class ApiTestCase(RighteousTestCase):
     def test_lookup_server_nickname_failure(self):
         self.response.content = '[]'
         assert_raises(Exception, righteous.api._lookup_server, None, 'unknown')
+
+
+class ServerTestCase(ApiTestCase):
 
     def test_list_servers_unconfigured(self):
         assert_raises(Exception, righteous.list_servers)
@@ -192,6 +209,7 @@ class ApiTestCase(RighteousTestCase):
     def test_delete_server(self):
         self.response.content = '{}'
         assert righteous.delete_server('/my/ref')
+        self.request.assert_called_once_with('/my/ref', method='DELETE', prepend_api_base=False)
 
     def test_create_server(self):
         nickname = 'foo'
@@ -233,12 +251,6 @@ class ApiTestCase(RighteousTestCase):
         righteous.set_server_parameters(server_href, parameters)
         self.request.assert_called_once_with(server_href, method='PUT', body=expected, headers={'Content-Type': 'application/x-www-form-urlencoded'}, prepend_api_base=False)
 
-    # TODO: test that create_server_parameters not containing an instance key errors
-    #def test_create_and_start_server_fails(self):
-        #success, location = righteous.create_and_start_server('titanic', 'm1.small')
-        #assert not success
-        #assert not location
-
     def test_create_and_start_server_fails(self):
         create_server_parameters = {
             'm1.small': 'https://my.rightscale.com/api/acct/123/ec2_server_templates/52271',
@@ -275,3 +287,57 @@ class ApiTestCase(RighteousTestCase):
 
         # start server
         self.request.assert_any_call(new_server_href+'/start', method='POST', prepend_api_base=False)
+
+
+class ServerTemplateTestCase(ApiTestCase):
+
+    def test_list_server_templates(self):
+        self.response.content = '{}'
+        righteous.list_server_templates()
+        self.request.assert_called_once_with('/server_templates.js')
+
+    def test_server_template_info(self):
+        template_href = 'https://my.rightscale.com/api/acct/account_id/ec2_server_templates/111'
+        server_template = [{
+            'href': template_href, 
+            'nickname': 'spurious'
+        }]
+        self.response.content = json.dumps(server_template)
+        response = righteous.server_template_info(template_href)
+        assert_equal(response, server_template)
+        self.request.assert_called_once_with('/server_templates/111.js')
+
+    def test_server_template_info_not_found(self):
+        template_href = 'https://my.rightscale.com/api/acct/account_id/ec2_server_templates/111'
+        self.response.content = '[]'
+        response = righteous.server_template_info(template_href)
+        assert_equal(response, None)
+        self.request.assert_called_once_with('/server_templates/111.js')
+
+    def test_create_server_template(self):
+        nickname = 'templator'
+        description = 'uber template for the masses'
+        cloud_image_href = '/foo/bar'
+
+        new_template_href = '/template/new'
+        self.response.status_code = 201
+        self.response.headers['location'] = new_template_href
+    
+        success, location = righteous.create_server_template(nickname, description, cloud_image_href)
+        assert success
+        assert_equal(location, new_template_href)
+
+        body = urlencode({
+            'server_template[nickname]': nickname,
+            'server_template[description]': description,
+            'server_template[multi_cloud_image_href]': cloud_image_href,
+        })
+
+        self.request.assert_called_once_with('/server_templates', method='POST', body=body)
+
+    def test_delete_server_template(self):
+        template_href = 'https://my.rightscale.com/api/acct/account_id/ec2_server_templates/111'
+        self.response.content = '{}'
+        assert righteous.delete_server_template(template_href)
+
+        self.request.assert_called_once_with('/server_templates/111.js', method='DELETE')
