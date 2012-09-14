@@ -13,3 +13,6 @@ server_template_href: https://my.rightscale.com/api/acct/123/ec2_server_template
 instance_type: m1.small
 m1.small: https://my.rightscale.com/api/acct/123/ec2_server_templates/74732
 m1.large: https://my.rightscale.com/api/acct/123/ec2_server_templates/117240
+
+[server-templates]
+multi_cloud_image: https://my.rightscale.com/api/acct/123/multi_cloud_images/76543

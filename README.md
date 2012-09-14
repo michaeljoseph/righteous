@@ -74,7 +74,7 @@ Remove an instance
     $ testify tests.unit
 
 The integration tests take a couple of  minutes to run since they tests all the current functionality (creating, starting, stopping, deleting environments)
-against RightScale.  These tests require a configured righteous.config in the root of the directory (copy and customise righteous.config.template)
+against RightScale.  These tests require a configured `righteous.config` in the root of the directory, so copy and customise `righteous.config.template` before running:
 
     $ testify tests.integration 
 
