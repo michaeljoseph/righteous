@@ -1,5 +1,13 @@
 # History
 
+## 0.3.0 (2012-09-14)
+
+- Add ServerTemplate crud API
+
+## 0.2.2 (2012-07-13)
+
+- CLI bugfix: correct server template parameter names
+
 ## 0.2.1 (2012-07-08)
 
 - Improve test coverage, pep8+pyflakes compliance
