@@ -6,7 +6,7 @@ test: init
 	coverage run `which testify` tests.unit
 
 ci: test
-	pep8 righteous > pep8.report
+	pep8 setup.py righteous > pep8.report
 	pyflakes docs righteous tests setup.py > pyflakes.report
 	coverage html
 
