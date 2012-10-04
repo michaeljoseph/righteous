@@ -61,8 +61,8 @@ CLI
     -v --verbose                 Show debug output          
     -h --help                    Show this screen.
 
-API
----
+Server API
+----------
 
 .. module:: righteous
 .. autofunction:: init
@@ -75,3 +75,11 @@ API
 .. autofunction:: stop_server
 .. autofunction:: delete_server
 
+ServerTemplate API
+------------------
+
+.. module:: righteous
+.. autofunction:: list_server_templates
+.. autofunction:: server_template_info
+.. autofunction:: create_server_template
+.. autofunction:: delete_server_template
