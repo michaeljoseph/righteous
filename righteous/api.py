@@ -24,12 +24,18 @@ ACCOUNT_URL = 'https://my.rightscale.com/api/acct/'
 
 
 def debug(message, *args):
+    """
+    Logs debug messages
+    """
     log.debug(message, *args)
     if config.settings.debug:
         config.settings.debug.write('%s\n' % (message % args))
 
 
 def _build_headers(headers=None):
+    """
+    Internal helper to build request headers
+    """
     request_headers = {'X-API-VERSION': '1.0'}
     if headers:
         request_headers.update(headers)
@@ -39,6 +45,9 @@ def _build_headers(headers=None):
 
 
 def _request(path, method='GET', body=None, headers={}, prepend_api_base=True):
+    """
+    Internal method to make API requests
+    """
     if prepend_api_base:
         path = ACCOUNT_URL + config.settings.account_id + path
     headers = _build_headers(headers=headers)
@@ -90,6 +99,7 @@ def login(username=None, password=None, account_id=None):
     :param username: (optional) String representing the username to login with
     :param password: (optional) String representing the password to login with
     :param account_id: (optional) String of the Rightscale account_id
+    :return: Boolean indicating successful login
     """
     if not username or not password or not account_id:
         username = config.settings.username
@@ -122,6 +132,8 @@ def list_servers(deployment_id=None):
 
     :param deployment_id: (optional) String representing Deployment to list
                           servers from
+    :return: dict of server deployment information:
+    http://reference.rightscale.com/api1.0/ApiR1V0/Docs/ApiDeployments.html
     """
     if not deployment_id:
         deployment_id = config.settings.default_deployment_id
@@ -140,6 +152,13 @@ def find_server(nickname):
 
     :param nickname: (optional) String representing the nickname of the server
                      to lookup
+    :return: dict of server information with the following keys:
+
+    ::
+
+        [u'deployment_href', u'tags', u'created_at', u'server_type',
+         u'updated_at', u'server_template_href', u'current_instance_href',
+         u'state', u'href', u'nickname']
     """
     response = _request('/servers.js?filter=nickname=%s' % nickname)
 
@@ -148,6 +167,13 @@ def find_server(nickname):
 
 
 def _lookup_server(server_href, nickname):
+    """
+    Helper to retrieve server href by href or nickname
+
+    :param server_href (optional): String of the server href
+    :param nickname (optional): String of the server nickname
+    :return: server href
+    """
     if not nickname and not server_href:
         raise ValueError('Either nickname or server_href must be specified')
 
@@ -167,6 +193,13 @@ def server_info(server_href, nickname=None):
 
     :param server_href: URL representing the server to query
     :param nickname: (optional) String representing the nickname of the server
+    :return: dict of server information with the following keys:
+
+    ::
+
+        [u'deployment_href', u'parameters', u'tags', u'created_at',
+         u'server_type', u'updated_at', u'server_template_href',
+         u'current_instance_href', u'state', u'href', u'nickname']
     """
     response = _request('%s.js' %
         _lookup_server(server_href, nickname), prepend_api_base=False)
@@ -179,6 +212,15 @@ def server_settings(server_href, nickname=None):
 
     :param server_href: URL representing the server to query settngs from
     :param nickname: (optional) String representing the nickname of the server
+    :return: dict of server settings with the following keys:
+
+    ::
+
+       [u'ec2-security-groups-href', u'private-ip-address',
+        u'ec2-ssh-key-href', u'private-dns-name', u'locked', u'dns-name',
+        u'pricing', u'cloud_id', u'ec2-availability-zone', u'aws-platform',
+        u'ip-address', u'aws-product-codes', u'aws-id', u'ec2-instance-type',
+        u'launched-by']
     """
     response = _request('%s/settings.js' %
         _lookup_server(server_href, nickname), prepend_api_base=False)
@@ -191,6 +233,7 @@ def start_server(server_href, nickname=None):
 
     :param server_href: URL representing the server to start
     :param nickname: (optional) String representing the nickname of the server
+    :return: `requests.Response`
     """
     return _request('%s/start' %
         _lookup_server(server_href, nickname), method='POST',
@@ -203,6 +246,7 @@ def stop_server(server_href, nickname=None):
 
     :param server_href: URL representing the server to stop
     :param nickname: (optional) String representing the nickname of the server
+    :return: `requests.Response`
     """
     return _request('%s/stop' %
         _lookup_server(server_href, nickname), method='POST',
@@ -215,6 +259,7 @@ def delete_server(server_href, nickname=None):
 
     :param server_href: URL representing the server to delete
     :param nickname: (optional) String representing the nickname of the server
+    :return: `requests.Response`
     """
     return _request(_lookup_server(server_href, nickname),
         method='DELETE', prepend_api_base=False).status_code == 200
@@ -228,6 +273,7 @@ def create_server(nickname, instance_type, create_server_parameters=None):
     :param instance_type: String of the EC2 instance type
     :param create_server_parameters: (optional) Dictionary of
                                      server creation parameters
+    :return: server href of the new server
     """
     if not create_server_parameters:
         create_server_parameters = config.settings.create_server_parameters
@@ -257,6 +303,7 @@ def set_server_parameters(server_href, parameters):
 
     :param server_url: URL representing the server to update
     :param parameters: Dictionary of ServerTemplate parameters to set
+    :return: `requests.Response`
     """
     input_data = []
     for key, value in parameters.items():
@@ -279,6 +326,7 @@ def create_and_start_server(nickname, instance_type,
                                      server creation parameters
     :param server_template_parameters: (optional) Dictionary of
                                        ServerTemplate parameters
+    :return: tuple of operation success and server href of the new instance
     """
     server_href = create_server(nickname, instance_type,
         create_server_parameters)
@@ -302,9 +350,15 @@ def create_and_start_server(nickname, instance_type,
 
 
 def list_server_templates():
-    """Lists ServerTemplates
+    """
+    Lists ServerTemplates
 
-    Returns JSON
+    :return: list of dicts of server information with the following keys:
+
+    ::
+
+        [u'description', u'is_head_version', u'created_at', u'updated_at',
+         u'href', u'version', u'nickname']
     """
     response = _request('/server_templates.js')
     return json.loads(response.content)
@@ -316,6 +370,7 @@ def _extract_template_id(template_href):
 
     :param template_href: String representing the server template
                           href
+    :return: String of the template_id or None
     """
     result = re.match(ACCOUNT_URL + config.settings.account_id +
                       '/ec2_server_templates/(\d+)',
@@ -326,12 +381,17 @@ def _extract_template_id(template_href):
 
 
 def server_template_info(template_href):
-    """Details ServerTemplate information
-
-    Returns JSON
+    """
+    Details ServerTemplate information
 
     :param template_href: String representing the server template
                           href
+    :return: dict of server template information, with the following keys:
+
+    ::
+
+        [u'description', u'is_head_version', u'created_at', u'updated_at',
+         u'href', u'version', u'nickname']
     """
     response = _request('/server_templates/%s.js' %
                         _extract_template_id(template_href))
@@ -343,13 +403,15 @@ def server_template_info(template_href):
 
 
 def create_server_template(nickname, description, multi_cloud_image_href):
-    """Create a new ServerTemplate
+    """
+    Create a new ServerTemplate
 
     Returns a tuple of operation status, href of the created, started server
 
     :param nickname: String of the template nickname
     :param description: String describing the ServerTemplate
     :param multi_cloud_image_href: String of the template image href
+    :return: tuple of operation success and new server template href
     """
     location = None
     success = False
@@ -371,9 +433,11 @@ def create_server_template(nickname, description, multi_cloud_image_href):
 
 
 def delete_server_template(server_template_href):
-    """Deletes a ServerTemplate
+    """
+    Deletes a ServerTemplate
 
     :param server_template_href: String of the ServerTemplate to delete
+    :return: `requests.Response`
     """
     return _request('/server_templates/%s.js' %
                     _extract_template_id(server_template_href),
