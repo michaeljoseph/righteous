@@ -18,7 +18,9 @@ class RequestsTestCase(TestCase):
 
         with patch('righteous.api.base.requests') as mock_requests:
             righteous.api.base._request('/test')
-            mock_requests.request.assert_called_once_with('GET', 'https://my.rightscale.com/api/acct/account_id/test', headers=headers, config={}, data=None)
+            mock_requests.request.assert_called_once_with('GET',
+                'https://my.rightscale.com/api/acct/account_id/test',
+                headers=headers, config={}, data=None)
 
     def test_request_no_prepend(self):
         username, password, account_id = 'user', 'pass', 'account_id'
@@ -27,16 +29,19 @@ class RequestsTestCase(TestCase):
 
         with patch('righteous.api.base.requests') as mock_requests:
             righteous.api.base._request('/test', prepend_api_base=False)
-            mock_requests.request.assert_called_once_with('GET', '/test', headers=headers, config={}, data=None)
+            mock_requests.request.assert_called_once_with('GET', '/test',
+                headers=headers, config={}, data=None)
 
 
 class ExtractTemplateIdTestCase(ApiTestCase):
 
     def test_ec2_template_href(self):
-        assert_equal(_extract_template_id('https://my.rightscale.com/api/acct/account_id/ec2_server_templates/12345'), '12345')
+        assert_equal(_extract_template_id('https://my.rightscale.com/api/acct/'
+            'account_id/ec2_server_templates/12345'), '12345')
 
     def test_unknown_ec2_template_href(self):
-        assert not _extract_template_id('https://my.rightscale.com/api/acct/account_id/rackspace_server_templates/12345')
+        assert not _extract_template_id('https://my.rightscale.com/api/acct/'
+            'account_id/rackspace_server_templates/12345')
 
 
 class BuildHeaderTestCase(RighteousTestCase):
@@ -46,12 +51,14 @@ class BuildHeaderTestCase(RighteousTestCase):
 
     def test_additional_headers(self):
         headers = {'foo': 'bar'}
-        assert_equal(_build_headers(headers), {'X-API-VERSION': '1.0', 'foo': 'bar'})
+        assert_equal(_build_headers(headers),
+            {'X-API-VERSION': '1.0', 'foo': 'bar'})
 
     def test_cookie_headers(self):
         config.settings.cookies = 'cookie_value'
         headers = {'baz': 'bar'}
-        assert_equal(_build_headers(headers), {'X-API-VERSION': '1.0', 'baz': 'bar', 'Cookie': 'cookie_value'})
+        assert_equal(_build_headers(headers),
+            {'X-API-VERSION': '1.0', 'baz': 'bar', 'Cookie': 'cookie_value'})
 
 
 class InitialiseTestCase(RighteousTestCase):
@@ -70,7 +77,8 @@ class InitialiseTestCase(RighteousTestCase):
         righteous.init('user', 'pass', 'account', debug=True, foo='bar')
         assert_equal(righteous.config.settings.username, 'user')
         assert_equal(righteous.config.settings.debug, sys.stderr)
-        assert_equal(righteous.config.settings.create_server_parameters['foo'], 'bar')
+        assert_equal(righteous.config.settings.create_server_parameters['foo'],
+            'bar')
 
     def test_init_deployment_id(self):
         righteous.init('user', 'pass', 'account', default_deployment_id='22')
@@ -103,7 +111,8 @@ class LoginTestCase(RighteousTestCase):
         self.response.headers['set-cookie'] = 'cookie_value'
         login_result = righteous.login()
         assert login_result
-        self.request.assert_called_once_with('/login', headers={'Authorization': 'Basic %s' % auth})
+        self.request.assert_called_once_with('/login',
+            headers={'Authorization': 'Basic %s' % auth})
 
     def test_login_with_credentials(self):
         username, password, account_id = 'foo', 'bar', '123'
@@ -113,4 +122,5 @@ class LoginTestCase(RighteousTestCase):
         self.response.headers['set-cookie'] = 'cookie_value'
         login_result = righteous.login(username, password, account_id)
         assert login_result
-        self.request.assert_called_once_with('/login', headers={'Authorization': 'Basic %s' % auth})
+        self.request.assert_called_once_with('/login',
+            headers={'Authorization': 'Basic %s' % auth})

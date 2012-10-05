@@ -5,6 +5,8 @@ from urllib import urlencode
 import omnijson as json
 from .base import ApiTestCase
 import righteous
+from righteous.config import account_url
+
 
 class ServerTemplateTestCase(ApiTestCase):
     @setup
@@ -18,9 +20,9 @@ class ServerTemplateTestCase(ApiTestCase):
         self.request.assert_called_once_with('/server_templates.js')
 
     def test_server_template_info(self):
-        template_href = 'https://my.rightscale.com/api/acct/account_id/ec2_server_templates/111'
+        template_href = account_url + 'account_id/ec2_server_templates/111'
         server_template = [{
-            'href': template_href, 
+            'href': template_href,
             'nickname': 'spurious'
         }]
         self.response.content = json.dumps(server_template)
@@ -29,7 +31,7 @@ class ServerTemplateTestCase(ApiTestCase):
         self.request.assert_called_once_with('/server_templates/111.js')
 
     def test_server_template_info_not_found(self):
-        template_href = 'https://my.rightscale.com/api/acct/account_id/ec2_server_templates/111'
+        template_href = account_url + 'account_id/ec2_server_templates/111'
         self.response.content = '[]'
         response = righteous.server_template_info(template_href)
         assert_equal(response, None)
@@ -43,8 +45,9 @@ class ServerTemplateTestCase(ApiTestCase):
         new_template_href = '/template/new'
         self.response.status_code = 201
         self.response.headers['location'] = new_template_href
-    
-        success, location = righteous.create_server_template(nickname, description, cloud_image_href)
+
+        success, location = righteous.create_server_template(nickname,
+            description, cloud_image_href)
         assert success
         assert_equal(location, new_template_href)
 
@@ -54,11 +57,13 @@ class ServerTemplateTestCase(ApiTestCase):
             'server_template[multi_cloud_image_href]': cloud_image_href,
         })
 
-        self.request.assert_called_once_with('/server_templates', method='POST', body=body)
+        self.request.assert_called_once_with('/server_templates',
+            method='POST', body=body)
 
     def test_delete_server_template(self):
-        template_href = 'https://my.rightscale.com/api/acct/account_id/ec2_server_templates/111'
+        template_href = account_url + 'account_id/ec2_server_templates/111'
         self.response.content = '{}'
         assert righteous.delete_server_template(template_href)
 
-        self.request.assert_called_once_with('/server_templates/111.js', method='DELETE')
+        self.request.assert_called_once_with('/server_templates/111.js',
+            method='DELETE')
