@@ -6,7 +6,7 @@ from ConfigParser import SafeConfigParser
 
 class RighteousTestCase(TestCase):
     envs = []
-    templates = []
+
 
     @class_setup
     def initialise_righteous(self):
@@ -31,13 +31,13 @@ class RighteousTestCase(TestCase):
         self.template = 'template-%s' % uuid4().hex
         self.username = self.auth['username']
 
-    def _create_server(self, instance_type='m1.small'):
-        parameters = dict(envname=self.env, email=self.username, mode='unattended', branches='none')
-        successful, location = righteous.create_and_start_server(self.env, instance_type, server_template_parameters=parameters)
-        assert successful
-        assert location is not None
-        if self.delete_server:
-            self.envs.append(self.env)
+
+class ServerTemplateTestCase(RighteousTestCase):
+    templates = []
+
+    @setup
+    def prepare_test(self):
+        pass
 
     def _create_template(self):
         if not self.config.has_section('server-templates'):
@@ -72,6 +72,16 @@ class RighteousTestCase(TestCase):
     def test_delete_server_template(self):
         template_href = self._create_template()
         assert righteous.delete_server_template(template_href)
+
+class ServerTestCase(RighteousTestCase):
+
+    def _create_server(self, instance_type='m1.small'):
+        parameters = dict(envname=self.env, email=self.username, mode='unattended', branches='none')
+        successful, location = righteous.create_and_start_server(self.env, instance_type, server_template_parameters=parameters)
+        assert successful
+        assert location is not None
+        if self.delete_server:
+            self.envs.append(self.env)
 
     def test_list_servers(self):
         servers = righteous.list_servers()

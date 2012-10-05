@@ -35,6 +35,7 @@ log = logging.getLogger('tty') if sys.stdin.isatty() else logging.getLogger()
 AUTH_FILE = os.path.expanduser('~/.righteous')
 COL = 30
 
+
 def error(message):
     puts_err(colored.red(message))
     exit(2)

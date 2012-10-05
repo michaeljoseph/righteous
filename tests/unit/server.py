@@ -1,14 +1,37 @@
-from testify import assert_equal
-
-from testify import setup, assert_raises
+import json
+from testify import assert_equal, setup, assert_raises
 from urllib import urlencode
-from .base import RighteousTestCase
+from .base import ApiTestCase
 import righteous
 
-class ServerTestCase(RighteousTestCase):
+
+class LookupServerTestCase(ApiTestCase):
     @setup
     def setup(self):
         self.setup_patching('righteous.api.server._request')
+        super(LookupServerTestCase, self).setup()
+
+    def test_lookup_server_unconfigured(self):
+        assert_raises(ValueError, righteous.api.server._lookup_server, None, None)
+
+    def test_lookup_server_href(self):
+        href = righteous.api.server._lookup_server('/foo/bar', None)
+        assert_equal(href, '/foo/bar')
+
+    def test_lookup_server_nickname(self):
+        self.response.content = json.dumps([{'href': '/naruto'}])
+        href = righteous.api.server._lookup_server(None, 'naruto')
+        assert_equal(href, '/naruto')
+
+    def test_lookup_server_nickname_failure(self):
+        self.response.content = '[]'
+        assert_raises(Exception, righteous.api.server._lookup_server, None, 'unknown')
+
+class ServerTestCase(ApiTestCase):
+    @setup
+    def setup(self):
+        self.setup_patching('righteous.api.server._request')
+        super(ServerTestCase, self).setup()
 
     def test_list_servers_unconfigured(self):
         assert_raises(Exception, righteous.list_servers)

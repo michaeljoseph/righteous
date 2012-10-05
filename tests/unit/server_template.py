@@ -3,13 +3,14 @@ from testify import assert_equal
 from testify import setup
 from urllib import urlencode
 import omnijson as json
-from .base import RighteousTestCase
+from .base import ApiTestCase
 import righteous
 
-class ServerTemplateTestCase(RighteousTestCase):
+class ServerTemplateTestCase(ApiTestCase):
     @setup
     def setup(self):
         self.setup_patching('righteous.api.server_template._request')
+        super(ServerTemplateTestCase, self).setup()
 
     def test_list_server_templates(self):
         self.response.content = '{}'

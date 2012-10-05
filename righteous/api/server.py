@@ -3,6 +3,7 @@ from urllib import urlencode
 from .base import _request, debug
 from .. import config
 
+
 def list_servers(deployment_id=None):
     """
     Lists servers in a deployment
@@ -196,7 +197,8 @@ def set_server_parameters(server_href, parameters):
 
 def create_and_start_server(nickname, instance_type,
         create_server_parameters=None, server_template_parameters=None):
-    """Creates and starts a server.
+    """
+    Creates and starts a server.
     Returns a tuple of operation status, href of the created, started server
 
     :param nickname: String representing the nickname of the server
