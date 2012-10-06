@@ -57,3 +57,5 @@ settings.username = None
 settings.password = None
 settings.account_id = None
 settings.requests_config = {}
+
+account_url = 'https://my.rightscale.com/api/acct/'

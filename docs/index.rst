@@ -65,7 +65,7 @@ Server API
 ----------
 
 .. module:: righteous
-.. autofunction:: init
+.. autofunction:: initialise
 .. autofunction:: login
 .. autofunction:: list_servers
 .. autofunction:: find_server

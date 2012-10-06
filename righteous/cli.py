@@ -36,6 +36,11 @@ AUTH_FILE = os.path.expanduser('~/.righteous')
 COL = 30
 
 
+def error(message):
+    puts_err(colored.red(message))
+    exit(2)
+
+
 def print_running_servers(servers, exclude_states=['stopped']):
 
     def server_owner(server_info):
@@ -85,21 +90,20 @@ def initialise(arguments):
 
     config = read_authentication(config_file or AUTH_FILE)
     if not config:
-        # TODO: prompt for config and store
-        pass
+        error('No configuration found. Either create "%s" or specify a '
+              'configuration file with -c FILE' % (AUTH_FILE))
 
     username, password, account_id = tuple(config.get('auth', key)
         for key in config.options('auth'))
 
     server_parameters = dict(config.items('server-defaults'))
-    righteous.init(username, password, account_id, **server_parameters)
+    righteous.initialise(username, password, account_id, **server_parameters)
 
     if righteous.login():
         cache_authentication(username, password, account_id,
             config_file or AUTH_FILE)
     else:
-        puts_err(colored.red('Authentication failed'))
-        exit(2)
+        error('Authentication failed')
 
     return verbose
 
@@ -126,8 +130,8 @@ def create(arguments):
         puts(colored.green('Created and started environment %s @ %s' %
             (arguments['<environment>'][0], location)))
     else:
-        puts(colored.red('Error creating environment %s' %
-            arguments['<environment>'][0]))
+        error('Error creating environment %s' %
+            arguments['<environment>'][0])
 
 
 def stop(arguments):
