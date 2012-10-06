@@ -1,5 +1,10 @@
 # History
 
+## 0.3.1 (2012-10-06)
+
+- Refactor api and tests into modules
+- Deprecate `righteous.init` in favour of `righteous.initialise`
+
 ## 0.3.0 (2012-09-14)
 
 - Add ServerTemplate crud API
