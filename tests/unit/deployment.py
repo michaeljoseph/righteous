@@ -55,5 +55,5 @@ class DeploymentTestCase(ApiTestCase):
         success, location = righteous.duplicate_deployment('/deployment/ref')
         assert success
         self.request.assert_any_call('/deployment/ref/duplicate',
-            method='POST')
+            method='POST', prepend_api_base=False)
         assert_equal(location, '/deployment/new_ref')

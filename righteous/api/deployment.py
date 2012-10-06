@@ -116,7 +116,8 @@ def duplicate_deployment(deployment_href, nickname=None):
     """
     location = None
     response = _request('%s/duplicate' %
-        _lookup_deployment(deployment_href, nickname), method='POST')
+        _lookup_deployment(deployment_href, nickname), method='POST',
+        prepend_api_base=False)
 
     success = response.status_code == 201
     if success:
