@@ -1,11 +1,8 @@
 import re
 from urllib import urlencode
-from logging import getLogger
 import omnijson as json
 from .. import config
 from .base import _request, debug
-
-log = getLogger(__name__)
 
 
 def list_server_templates():
@@ -95,7 +92,7 @@ def delete_server_template(server_template_href):
     Deletes a ServerTemplate
 
     :param server_template_href: String of the ServerTemplate to delete
-    :return: `requests.Response`
+    :return: Boolean of operation success/failure
     """
     return _request('/server_templates/%s.js' %
                     _extract_template_id(server_template_href),

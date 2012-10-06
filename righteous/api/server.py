@@ -6,7 +6,7 @@ from .. import config
 
 def _lookup_server(server_href, nickname):
     """
-    Convience wrapper around `righteous.base.lookup_by_href_or_nickname`
+    Convenience wrapper around `righteous.base.lookup_by_href_or_nickname`
     """
     return lookup_by_href_or_nickname(server_href, nickname, find_server)
 
@@ -123,7 +123,7 @@ def delete_server(server_href, nickname=None):
 
     :param server_href: URL representing the server to delete
     :param nickname: (optional) String representing the nickname of the server
-    :return: `requests.Response`
+    :return: Boolean of operation success/failure
     """
     return _request(_lookup_server(server_href, nickname),
         method='DELETE', prepend_api_base=False).status_code == 200
