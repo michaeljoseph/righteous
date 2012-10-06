@@ -1,3 +1,4 @@
+import json
 import sys
 import base64
 from testify import TestCase, setup, assert_equal, assert_raises
@@ -124,3 +125,42 @@ class LoginTestCase(RighteousTestCase):
         assert login_result
         self.request.assert_called_once_with('/login',
             headers={'Authorization': 'Basic %s' % auth})
+
+
+class LookupServerTestCase(ApiTestCase):
+    @setup
+    def setup(self):
+        self.setup_patching('righteous.api.server._request')
+        super(LookupServerTestCase, self).setup()
+
+    def test_lookup_unconfigured(self):
+        assert_raises(ValueError,
+            righteous.api.base.lookup_by_href_or_nickname,
+            None,
+            None,
+            righteous.api.server.find_server)
+
+    def test_lookup_href(self):
+        href = righteous.api.base.lookup_by_href_or_nickname('/foo/bar', None,
+            righteous.api.server.find_server)
+        assert_equal(href, '/foo/bar')
+
+    def test_lookup_nickname(self):
+        self.response.content = json.dumps([{'href': '/naruto'}])
+        href = righteous.api.base.lookup_by_href_or_nickname(None, 'naruto',
+            righteous.api.server.find_server)
+        assert_equal(href, '/naruto')
+
+    def test_lookup_nickname_failure(self):
+        self.response.content = '[]'
+        assert_raises(Exception,
+            righteous.api.base.lookup_by_href_or_nickname, None,
+            'unknown', righteous.api.server.find_server)
+
+    def test_lookup_server_href(self):
+        href = righteous.api.server._lookup_server('/foo/bar', None)
+        assert_equal(href, '/foo/bar')
+
+    def test_lookup_deployment_href(self):
+        href = righteous.api.deployment._lookup_deployment('/foo/bar', None)
+        assert_equal(href, '/foo/bar')
