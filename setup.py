@@ -28,9 +28,9 @@ setup(
     long_description=(
         '**righteous** is a Python client implementation of the '
         '`RightScale API <http://support.rightscale.com/rdoc>`_ '
-        'for EC2 instance management.'
+        'for EC2 instance management.\n\n'
         'Source Code: `https://github.com/michaeljoseph/righteous '
-        '<https://github.com/michaeljoseph/righteous>`_'
+        '<https://github.com/michaeljoseph/righteous>`_\n\n'
         'RTFD: `http://righteous.readthedocs.org '
         '<http://righteous.readthedocs.org>`_'
     ),
