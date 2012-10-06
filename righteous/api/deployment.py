@@ -36,6 +36,7 @@ def find_deployment(nickname):
     :return: dict of deployment information with the following keys:
 
     ::
+
         [u'href', u'description', u'tags', u'default_ec2_availability_zone',
          u'default_vpc_subnet_href', u'created_at', u'nickname', u'updated_at',
          u'servers']
@@ -56,6 +57,7 @@ def deployment_info(deployment_href, nickname=None):
     :return: dict of deployment information with the following keys
 
     ::
+
         [u'href', u'description', u'tags', u'default_ec2_availability_zone',
          u'default_vpc_subnet_href', u'created_at', u'nickname', u'updated_at',
          u'servers']
