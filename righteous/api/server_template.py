@@ -1,11 +1,8 @@
 import re
 from urllib import urlencode
-from logging import getLogger
 import omnijson as json
 from .. import config
 from .base import _request, debug
-
-log = getLogger(__name__)
 
 
 def list_server_templates():
@@ -73,7 +70,6 @@ def create_server_template(nickname, description, multi_cloud_image_href):
     :return: tuple of operation success and new server template href
     """
     location = None
-    success = False
     create_data = {
         'server_template[nickname]': nickname,
         'server_template[description]': description,
@@ -85,7 +81,7 @@ def create_server_template(nickname, description, multi_cloud_image_href):
     success = response.status_code == 201
     if success:
         location = response.headers.get('location')
-        debug('Created ServerTemplate %s: %s (%s:%s)' % (nickname, location,
+        debug('Created server template %s: %s (%s:%s)' % (nickname, location,
             response.status_code, response.content))
     # TODO: error responses
     return success, location
@@ -96,7 +92,7 @@ def delete_server_template(server_template_href):
     Deletes a ServerTemplate
 
     :param server_template_href: String of the ServerTemplate to delete
-    :return: `requests.Response`
+    :return: Boolean of operation success/failure
     """
     return _request('/server_templates/%s.js' %
                     _extract_template_id(server_template_href),

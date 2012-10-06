@@ -78,8 +78,17 @@ Server API
 ServerTemplate API
 ------------------
 
-.. module:: righteous
 .. autofunction:: list_server_templates
 .. autofunction:: server_template_info
 .. autofunction:: create_server_template
 .. autofunction:: delete_server_template
+
+Deployment API
+--------------
+
+.. autofunction:: list_deployments
+.. autofunction:: find_deployment
+.. autofunction:: deployment_info
+.. autofunction:: create_deployment
+.. autofunction:: delete_deployment
+.. autofunction:: duplicate_deployment

@@ -123,3 +123,25 @@ def login(username=None, password=None, account_id=None):
         return True
 
     return False
+
+
+def lookup_by_href_or_nickname(href, nickname, find_function):
+    """
+    Helper to retrieve items by href or nickname
+
+    :param href (optional): String of the item href
+    :param nickname (optional): String of the item nickname
+    :param find_function: The function to use to find by nickname
+    :return: String of the item href
+    """
+    if not nickname and not href:
+        raise ValueError('Either nickname or href must be specified')
+
+    if href:
+        return href
+    elif nickname:
+        item = find_function(nickname)
+        if item and 'href' in item:
+            return item['href']
+        else:
+            raise Exception('No item nicknamed %s found' % nickname)

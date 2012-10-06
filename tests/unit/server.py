@@ -1,34 +1,8 @@
-import json
 from testify import assert_equal, setup, assert_raises
 from urllib import urlencode
 from .base import ApiTestCase
 import righteous
 from righteous.config import account_url
-
-
-class LookupServerTestCase(ApiTestCase):
-    @setup
-    def setup(self):
-        self.setup_patching('righteous.api.server._request')
-        super(LookupServerTestCase, self).setup()
-
-    def test_lookup_server_unconfigured(self):
-        assert_raises(ValueError, righteous.api.server._lookup_server, None,
-            None)
-
-    def test_lookup_server_href(self):
-        href = righteous.api.server._lookup_server('/foo/bar', None)
-        assert_equal(href, '/foo/bar')
-
-    def test_lookup_server_nickname(self):
-        self.response.content = json.dumps([{'href': '/naruto'}])
-        href = righteous.api.server._lookup_server(None, 'naruto')
-        assert_equal(href, '/naruto')
-
-    def test_lookup_server_nickname_failure(self):
-        self.response.content = '[]'
-        assert_raises(Exception, righteous.api.server._lookup_server, None,
-            'unknown')
 
 
 class ServerTestCase(ApiTestCase):
@@ -56,32 +30,32 @@ class ServerTestCase(ApiTestCase):
 
     def test_server_info(self):
         self.response.content = '{}'
-        response = righteous.server_info('/my/ref')
+        response = righteous.server_info('/server/ref')
         assert_equal(response, {})
-        self.request.assert_called_once_with('/my/ref.js',
+        self.request.assert_called_once_with('/server/ref.js',
             prepend_api_base=False)
 
     def test_server_settings(self):
         self.response.content = '{}'
-        response = righteous.server_settings('/my/ref')
+        response = righteous.server_settings('/server/ref')
         assert_equal(response, {})
 
     def test_start_server(self):
         self.response.content = '{}'
-        righteous.start_server('/my/ref')
-        self.request.assert_called_once_with('/my/ref/start', method='POST',
-            prepend_api_base=False)
+        righteous.start_server('/server/ref')
+        self.request.assert_called_once_with('/server/ref/start',
+            method='POST', prepend_api_base=False)
 
     def test_stop_server(self):
         self.response.status_code = 201
-        assert righteous.stop_server('/my/ref')
-        self.request.assert_called_once_with('/my/ref/stop', method='POST',
+        assert righteous.stop_server('/server/ref')
+        self.request.assert_called_once_with('/server/ref/stop', method='POST',
             prepend_api_base=False)
 
     def test_delete_server(self):
         self.response.content = '{}'
-        assert righteous.delete_server('/my/ref')
-        self.request.assert_called_once_with('/my/ref', method='DELETE',
+        assert righteous.delete_server('/server/ref')
+        self.request.assert_called_once_with('/server/ref', method='DELETE',
             prepend_api_base=False)
 
     def test_create_server(self):

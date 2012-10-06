@@ -1,5 +1,11 @@
 # History
 
+## 0.4.0 (2012-10-06)
+
+- Add Server Deployment CRUD API
+- Refactor integration tests into modules
+- Refactored lookup by href or nickname function
+
 ## 0.3.1 (2012-10-06)
 
 - Refactor api and tests into modules
@@ -7,7 +13,7 @@
 
 ## 0.3.0 (2012-09-14)
 
-- Add ServerTemplate crud API
+- Add ServerTemplate CRUD API
 
 ## 0.2.2 (2012-07-13)
 
