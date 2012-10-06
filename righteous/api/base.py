@@ -1,20 +1,20 @@
 # coding: utf-8
-
 """
 righteous.api
 
 Implements the RightScale API for EC2 instance management.
 """
-
-from .. import config
+import warnings
 import sys
 import base64
+from logging import getLogger
+from .. import config
 # HACK: to allow setup.py to import __version__ from righteous/__init__.py
 try:
     import requests
 except ImportError:
     pass
-from logging import getLogger
+
 log = getLogger(__name__)
 
 
@@ -52,6 +52,12 @@ def _request(path, method='GET', body=None, headers={}, prepend_api_base=True):
 
 
 def init(username, password, account_id, **kwargs):
+    warnings.warn('init deprecated, use initialise instead.',
+        DeprecationWarning)
+    initialise(username, password, account_id, **kwargs)
+
+
+def initialise(username, password, account_id, **kwargs):
     """
     Initialises righteous configuration
 

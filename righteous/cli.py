@@ -97,7 +97,7 @@ def initialise(arguments):
         for key in config.options('auth'))
 
     server_parameters = dict(config.items('server-defaults'))
-    righteous.init(username, password, account_id, **server_parameters)
+    righteous.initialise(username, password, account_id, **server_parameters)
 
     if righteous.login():
         cache_authentication(username, password, account_id,
