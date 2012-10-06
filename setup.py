@@ -39,6 +39,7 @@ setup(
     url='https://github.com/michaeljoseph/righteous',
     packages=[
         'righteous',
+        'righteous.api',
     ],
     install_requires=required,
     entry_points={
