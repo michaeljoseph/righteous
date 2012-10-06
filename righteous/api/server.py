@@ -1,19 +1,24 @@
 import omnijson as json
-from urllib import urlencode
-from .base import _request, debug
+from urllib import urlencode, quote
+from .base import _request, debug, lookup_by_href_or_nickname
 from .. import config
+
+
+def _lookup_server(server_href, nickname):
+    """
+    Convience wrapper around `righteous.base.lookup_by_href_or_nickname`
+    """
+    return lookup_by_href_or_nickname(server_href, nickname, find_server)
 
 
 def list_servers(deployment_id=None):
     """
     Lists servers in a deployment
 
-    Returns JSON
-
     :param deployment_id: (optional) String representing Deployment to list
                           servers from
     :return: dict of server deployment information:
-    http://reference.rightscale.com/api1.0/ApiR1V0/Docs/ApiDeployments.html
+        http://reference.rightscale.com/api1.0/ApiR1V0/Docs/ApiDeployments.html
     """
     if not deployment_id:
         deployment_id = config.settings.default_deployment_id
@@ -40,31 +45,10 @@ def find_server(nickname):
          u'updated_at', u'server_template_href', u'current_instance_href',
          u'state', u'href', u'nickname']
     """
-    response = _request('/servers.js?filter=nickname=%s' % nickname)
+    response = _request('/servers.js?filter=nickname=%s' % quote(nickname))
 
     servers = json.loads(response.content)
     return servers[0] if len(servers) else None
-
-
-def _lookup_server(server_href, nickname):
-    """
-    Helper to retrieve server href by href or nickname
-
-    :param server_href (optional): String of the server href
-    :param nickname (optional): String of the server nickname
-    :return: server href
-    """
-    if not nickname and not server_href:
-        raise ValueError('Either nickname or server_href must be specified')
-
-    if server_href:
-        return server_href
-    elif nickname:
-        server = find_server(nickname)
-        if server and 'href' in server:
-            return server['href']
-        else:
-            raise Exception('No environment named %s found' % nickname)
 
 
 def server_info(server_href, nickname=None):
@@ -90,7 +74,7 @@ def server_settings(server_href, nickname=None):
     """
     Current server settings
 
-    :param server_href: URL representing the server to query settngs from
+    :param server_href: URL representing the server to query settings from
     :param nickname: (optional) String representing the nickname of the server
     :return: dict of server settings with the following keys:
 
@@ -171,7 +155,7 @@ def create_server(nickname, instance_type, create_server_parameters=None):
 
     response = _request('/servers', method='POST', body=urlencode(create_data))
     location = response.headers.get('location')
-    debug('Created %s: %s (%s:%s)' % (nickname, location,
+    debug('Created server %s: %s (%s:%s)' % (nickname, location,
         response.status_code, response.content))
     # TODO: error responses
     return location
