@@ -79,6 +79,7 @@ class ServerTestCase(ApiTestCase):
         self.request.assert_called_once_with('/servers', method='POST',
             body=expected)
 
+    ## TODO: test create failure
     def test_create_server_with_init_params(self):
         create_server_parameters = {
             'm1.small': account_url + '123/ec2_server_templates/52271',

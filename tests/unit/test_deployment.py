@@ -30,6 +30,8 @@ class DeploymentTestCase(ApiTestCase):
             prepend_api_base=False)
 
     def test_create_deployment(self):
+        self.response.status_code = 201
+        self.response.headers['location'] = '/deployment/new_ref'
         nickname = 'devops'
         description = 'devops deployment'
         create_data = {
@@ -38,9 +40,11 @@ class DeploymentTestCase(ApiTestCase):
         }
         expected = urlencode(create_data)
 
-        righteous.create_deployment(nickname, description)
+        success, location = righteous.create_deployment(nickname, description)
         self.request.assert_called_once_with('/deployments', method='POST',
             body=expected)
+        assert success
+        self.assertEqual(location, '/deployment/new_ref')
 
     def test_delete_deployment(self):
         self.response.content = '{}'
