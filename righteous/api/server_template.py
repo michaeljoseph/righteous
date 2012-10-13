@@ -1,5 +1,5 @@
 import re
-from urllib import urlencode
+from ..compat import urlencode
 import omnijson as json
 from .. import config
 from .base import _request, debug

@@ -1,5 +1,5 @@
 import omnijson as json
-from urllib import urlencode, quote
+from ..compat import urlencode, quote
 from .base import _request, debug, lookup_by_href_or_nickname
 from .. import config
 
