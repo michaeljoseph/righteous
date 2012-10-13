@@ -1,7 +1,7 @@
 import json
 import sys
 import base64
-import unittest
+import unittest2 as unittest
 from .base import ApiTestCase, RighteousTestCase
 import righteous
 from righteous.api.server_template import _extract_template_id
