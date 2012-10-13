@@ -1,14 +1,13 @@
-from testify import assert_equal, setup
 from urllib import urlencode
 from .base import ApiTestCase
 import righteous
 
 
 class DeploymentTestCase(ApiTestCase):
-    @setup
-    def setup(self):
+
+    def setUp(self):
         self.setup_patching('righteous.api.deployment._request')
-        super(DeploymentTestCase, self).setup()
+        super(DeploymentTestCase, self).setUp()
 
     def test_list_deployments(self):
         righteous.init('user', 'pass', 'account_id',
@@ -31,6 +30,8 @@ class DeploymentTestCase(ApiTestCase):
             prepend_api_base=False)
 
     def test_create_deployment(self):
+        self.response.status_code = 201
+        self.response.headers['location'] = '/deployment/new_ref'
         nickname = 'devops'
         description = 'devops deployment'
         create_data = {
@@ -39,9 +40,11 @@ class DeploymentTestCase(ApiTestCase):
         }
         expected = urlencode(create_data)
 
-        righteous.create_deployment(nickname, description)
+        success, location = righteous.create_deployment(nickname, description)
         self.request.assert_called_once_with('/deployments', method='POST',
             body=expected)
+        assert success
+        self.assertEqual(location, '/deployment/new_ref')
 
     def test_delete_deployment(self):
         self.response.content = '{}'
@@ -56,4 +59,4 @@ class DeploymentTestCase(ApiTestCase):
         assert success
         self.request.assert_any_call('/deployment/ref/duplicate',
             method='POST', prepend_api_base=False)
-        assert_equal(location, '/deployment/new_ref')
+        self.assertEqual(location, '/deployment/new_ref')
