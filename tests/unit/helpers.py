@@ -1,7 +1,7 @@
 import json
 import sys
 import base64
-from testify import TestCase, setup, assert_equal, assert_raises
+import unittest
 from .base import ApiTestCase, RighteousTestCase
 import righteous
 from righteous.api.server_template import _extract_template_id
@@ -10,7 +10,7 @@ from righteous import config
 from mock import patch
 
 
-class RequestsTestCase(TestCase):
+class RequestsTestCase(unittest.TestCase):
 
     def test_request(self):
         username, password, account_id = 'user', 'pass', 'account_id'
@@ -37,7 +37,7 @@ class RequestsTestCase(TestCase):
 class ExtractTemplateIdTestCase(ApiTestCase):
 
     def test_ec2_template_href(self):
-        assert_equal(_extract_template_id('https://my.rightscale.com/api/acct/'
+        self.assertEqual(_extract_template_id('https://my.rightscale.com/api/acct/'
             'account_id/ec2_server_templates/12345'), '12345')
 
     def test_unknown_ec2_template_href(self):
@@ -48,56 +48,55 @@ class ExtractTemplateIdTestCase(ApiTestCase):
 class BuildHeaderTestCase(RighteousTestCase):
 
     def test_build_headers(self):
-        assert_equal(_build_headers(), {'X-API-VERSION': '1.0'})
+        self.assertEqual(_build_headers(), {'X-API-VERSION': '1.0'})
 
     def test_additional_headers(self):
         headers = {'foo': 'bar'}
-        assert_equal(_build_headers(headers),
+        self.assertEqual(_build_headers(headers),
             {'X-API-VERSION': '1.0', 'foo': 'bar'})
 
     def test_cookie_headers(self):
         config.settings.cookies = 'cookie_value'
         headers = {'baz': 'bar'}
-        assert_equal(_build_headers(headers),
+        self.assertEqual(_build_headers(headers),
             {'X-API-VERSION': '1.0', 'baz': 'bar', 'Cookie': 'cookie_value'})
 
 
 class InitialiseTestCase(RighteousTestCase):
 
     def test_init(self):
-        assert_raises(Exception, righteous.init)
+        self.assertRaises(Exception, righteous.init)
 
     def test_init_with_null_arg(self):
-        assert_raises(Exception, righteous.init, 'user', 'pass', None)
+        self.assertRaises(Exception, righteous.init, 'user', 'pass', None)
 
     def test_init_with_args(self):
         righteous.init('user', 'pass', 'account')
-        assert_equal(righteous.config.settings.username, 'user')
+        self.assertEqual(righteous.config.settings.username, 'user')
 
     def test_init_with_kwargs(self):
         righteous.init('user', 'pass', 'account', debug=True, foo='bar')
-        assert_equal(righteous.config.settings.username, 'user')
-        assert_equal(righteous.config.settings.debug, sys.stderr)
-        assert_equal(righteous.config.settings.create_server_parameters['foo'],
+        self.assertEqual(righteous.config.settings.username, 'user')
+        self.assertEqual(righteous.config.settings.debug, sys.stderr)
+        self.assertEqual(righteous.config.settings.create_server_parameters['foo'],
             'bar')
 
     def test_init_deployment_id(self):
         righteous.init('user', 'pass', 'account', default_deployment_id='22')
 
-        assert_equal(righteous.config.settings.default_deployment_id, '22')
+        self.assertEqual(righteous.config.settings.default_deployment_id, '22')
         server_parameters = righteous.config.settings.create_server_parameters
-        assert_equal(server_parameters['deployment_href'],
+        self.assertEqual(server_parameters['deployment_href'],
             'https://my.rightscale.com/api/acct/account/deployments/22')
 
 
 class LoginTestCase(RighteousTestCase):
 
-    @setup
-    def setup(self):
+    def setUp(self):
         self.setup_patching('righteous.api.base._request')
 
     def test_login(self):
-        assert_raises(Exception, righteous.login)
+        self.assertRaises(Exception, righteous.login)
 
     def test_login_failure(self):
         assert not righteous.login('foo', 'bar', 'buzz')
@@ -128,13 +127,13 @@ class LoginTestCase(RighteousTestCase):
 
 
 class LookupServerTestCase(ApiTestCase):
-    @setup
-    def setup(self):
+
+    def setUp(self):
         self.setup_patching('righteous.api.server._request')
-        super(LookupServerTestCase, self).setup()
+        super(LookupServerTestCase, self).setUp()
 
     def test_lookup_unconfigured(self):
-        assert_raises(ValueError,
+        self.assertRaises(ValueError,
             righteous.api.base.lookup_by_href_or_nickname,
             None,
             None,
@@ -143,24 +142,24 @@ class LookupServerTestCase(ApiTestCase):
     def test_lookup_href(self):
         href = righteous.api.base.lookup_by_href_or_nickname('/foo/bar', None,
             righteous.api.server.find_server)
-        assert_equal(href, '/foo/bar')
+        self.assertEqual(href, '/foo/bar')
 
     def test_lookup_nickname(self):
         self.response.content = json.dumps([{'href': '/naruto'}])
         href = righteous.api.base.lookup_by_href_or_nickname(None, 'naruto',
             righteous.api.server.find_server)
-        assert_equal(href, '/naruto')
+        self.assertEqual(href, '/naruto')
 
     def test_lookup_nickname_failure(self):
         self.response.content = '[]'
-        assert_raises(Exception,
+        self.assertRaises(Exception,
             righteous.api.base.lookup_by_href_or_nickname, None,
             'unknown', righteous.api.server.find_server)
 
     def test_lookup_server_href(self):
         href = righteous.api.server._lookup_server('/foo/bar', None)
-        assert_equal(href, '/foo/bar')
+        self.assertEqual(href, '/foo/bar')
 
     def test_lookup_deployment_href(self):
         href = righteous.api.deployment._lookup_deployment('/foo/bar', None)
-        assert_equal(href, '/foo/bar')
+        self.assertEqual(href, '/foo/bar')

@@ -1,4 +1,3 @@
-from testify import assert_equal, setup, assert_raises
 from urllib import urlencode
 from .base import ApiTestCase
 import righteous
@@ -6,13 +5,13 @@ from righteous.config import account_url
 
 
 class ServerTestCase(ApiTestCase):
-    @setup
-    def setup(self):
+
+    def setUp(self):
         self.setup_patching('righteous.api.server._request')
-        super(ServerTestCase, self).setup()
+        super(ServerTestCase, self).setUp()
 
     def test_list_servers_unconfigured(self):
-        assert_raises(Exception, righteous.list_servers)
+        self.assertRaises(Exception, righteous.list_servers)
 
     def test_list_servers(self):
         righteous.init('user', 'pass', 'account_id',
@@ -31,14 +30,14 @@ class ServerTestCase(ApiTestCase):
     def test_server_info(self):
         self.response.content = '{}'
         response = righteous.server_info('/server/ref')
-        assert_equal(response, {})
+        self.assertEqual(response, {})
         self.request.assert_called_once_with('/server/ref.js',
             prepend_api_base=False)
 
     def test_server_settings(self):
         self.response.content = '{}'
         response = righteous.server_settings('/server/ref')
-        assert_equal(response, {})
+        self.assertEqual(response, {})
 
     def test_start_server(self):
         self.response.content = '{}'
@@ -134,7 +133,7 @@ class ServerTestCase(ApiTestCase):
             'm1.small', server_template_parameters={'envname': 'arduous'})
         assert success
 
-        assert_equal(self.request.call_count, 3)
+        self.assertEqual(self.request.call_count, 3)
 
         # create server
         create_data = {
