@@ -1,4 +1,4 @@
-from urllib import urlencode
+from righteous.compat import urlencode
 from .base import ApiTestCase
 import righteous
 from righteous.config import account_url
@@ -102,8 +102,8 @@ class ServerTestCase(ApiTestCase):
         server_href = 'http://foo'
         parameters = {'foo': 'bar', 'baz': 'buzz'}
 
-        expected = ('server[parameters][FOO]=text:bar&'
-                   'server[parameters][BAZ]=text:buzz')
+        expected = ('server[parameters][BAZ]=text:buzz&'
+                    'server[parameters][FOO]=text:bar')
 
         righteous.set_server_parameters(server_href, parameters)
         self.request.assert_called_once_with(server_href, method='PUT',

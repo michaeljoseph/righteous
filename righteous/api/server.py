@@ -170,9 +170,9 @@ def set_server_parameters(server_href, parameters):
     :return: `requests.Response`
     """
     input_data = []
-    for key, value in parameters.items():
+    for key in sorted(parameters.keys()):
         input_data.append('server[parameters][%s]=text:%s'
-            % (key.upper(), value))
+            % (key.upper(), parameters[key]))
     update = '&'.join(input_data)
     return _request(server_href, method='PUT', body=update,
         headers={'Content-Type': 'application/x-www-form-urlencoded'},
