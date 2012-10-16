@@ -1,4 +1,4 @@
-from urllib import urlencode
+from righteous.compat import urlencode
 import omnijson as json
 from .base import ApiTestCase
 import righteous

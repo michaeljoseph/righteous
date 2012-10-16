@@ -7,13 +7,10 @@ Implements the RightScale API for EC2 instance management.
 import warnings
 import sys
 import base64
+import six
 from logging import getLogger
 from .. import config
-# HACK: to allow setup.py to import __version__ from righteous/__init__.py
-try:
-    import requests
-except ImportError:
-    pass
+import requests
 
 log = getLogger(__name__)
 
@@ -112,8 +109,9 @@ def login(username=None, password=None, account_id=None):
             'configuration or as an API parameter')
 
     auth_hash = '%s:%s' % (username, password)
+
     response = _request('/login', headers={
-        'Authorization': 'Basic %s' % base64.encodestring(auth_hash)[:-1]
+        'Authorization': 'Basic %s' % base64.b64encode(six.b(auth_hash))[:-1]
     })
 
     if response.status_code == 204:

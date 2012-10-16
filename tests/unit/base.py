@@ -1,9 +1,17 @@
-import unittest2 as unittest
 import requests
-import righteous
+from mock import Mock, patch
+import six
 from righteous import config
 from righteous.config import Settings
-from mock import Mock, patch
+import righteous
+
+unittest = None
+if six.PY3:
+    import unittest
+    unittest = unittest
+else:
+    import unittest2
+    unittest = unittest2
 
 
 class RighteousTestCase(unittest.TestCase):

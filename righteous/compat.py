@@ -1,9 +1,11 @@
+import six
+
 urlencode = quote = None
-try:
+if six.PY3:
     import urllib.parse
     urlencode = urllib.parse.urlencode
     quote = urllib.parse.quote
-except ImportError:
+else:
     import urllib
     urlencode = urllib.urlencode
     quote = urllib.quote
