@@ -1,13 +1,13 @@
 import json
 import sys
 import base64
-import unittest2 as unittest
-from .base import ApiTestCase, RighteousTestCase
-import righteous
+import six
+from mock import patch
 from righteous.api.server_template import _extract_template_id
 from righteous.api.base import _build_headers
 from righteous import config
-from mock import patch
+import righteous
+from .base import ApiTestCase, RighteousTestCase, unittest
 
 
 class RequestsTestCase(unittest.TestCase):
@@ -104,7 +104,8 @@ class LoginTestCase(RighteousTestCase):
 
     def test_login_with_init_credentials(self):
         username, password, account_id = 'user', 'pass', 'account_id'
-        auth = base64.encodestring('%s:%s' % (username, password))[:-1]
+
+        auth = base64.b64encode(six.b('%s:%s' % (username, password)))[:-1]
 
         righteous.init(username, password, account_id)
 
@@ -117,7 +118,7 @@ class LoginTestCase(RighteousTestCase):
 
     def test_login_with_credentials(self):
         username, password, account_id = 'foo', 'bar', '123'
-        auth = base64.encodestring('%s:%s' % (username, password))[:-1]
+        auth = base64.b64encode(six.b('%s:%s' % (username, password)))[:-1]
 
         self.response.status_code = 204
         self.response.headers['set-cookie'] = 'cookie_value'
