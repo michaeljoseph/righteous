@@ -78,7 +78,7 @@ def print_running_servers(servers, exclude_states=['stopped']):
             [str(line['days']), COL],
         ), stream=output.write)
 
-    print output.getvalue()
+    print(output.getvalue())
 
 
 def initialise(arguments):
@@ -198,7 +198,7 @@ def status(arguments):
             puts(colored.red('%s: Not Found' % environment),
                     stream=output.write)
 
-    print output.getvalue()
+    print(output.getvalue())
 
 
 def main():
