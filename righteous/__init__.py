@@ -1,6 +1,3 @@
-__version__ = '0.4.0'
-__author__ = 'Michael Joseph'
-
 from .api.base import init, initialise, login
 from .api.server import (list_servers, find_server, server_info,
     server_settings, create_and_start_server, create_server,
