@@ -1,5 +1,5 @@
 from righteous.compat import urlencode
-import omnijson as json
+import json
 from .base import ApiTestCase
 import righteous
 from righteous.config import account_url

@@ -1,6 +1,6 @@
 import re
 from ..compat import urlencode
-import omnijson as json
+import json
 from .. import config
 from .base import _request, debug
 

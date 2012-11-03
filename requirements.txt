@@ -1,5 +1,4 @@
 requests==0.14.1
-omnijson==0.1.2
 clint==0.3.1
 docopt==0.4.1
 six==1.2.0

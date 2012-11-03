@@ -19,11 +19,7 @@ if sys.argv[-1] == "publish":
     sys.exit()
 
 PY3 = sys.version_info[0] == 3
-required = [
-    'requests==0.14.1', 'clint==0.3.1',
-    'omnijson==0.1.2', 'docopt==0.4.1',
-    'six==1.2.0'
-]
+required = ['requests==0.14.1', 'clint==0.3.1', 'docopt==0.4.1', 'six==1.2.0']
 test_suite = 'tests.unit'
 tests_require = ['mock==0.8.0']
 if not PY3:
