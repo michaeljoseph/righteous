@@ -13,6 +13,41 @@ try:
 except ImportError:
     from distutils.core import setup
 
+from setuptools.command.test import test as TestCommand
+
+
+class Coverage(TestCommand):
+    """
+    A command to run tests with coverage and generate an html report
+    """
+    description = "generates a coverage report"
+
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        import coverage
+        unittest = None
+        if PY3:
+            import unittest
+            unittest = unittest
+        else:
+            import unittest2 as unittest
+            unittest = unittest
+
+        cov = coverage.coverage(branch=True, source=["righteous"])
+        cov.erase()
+        cov.start()
+
+        loader = unittest.TestLoader()
+        tests = loader.discover('tests')
+        test_runner = unittest.runner.TextTestRunner()
+        test_runner.run(tests)
+
+        cov.stop()
+        cov.html_report(directory='htmlcov')
 
 if sys.argv[-1] == "publish":
     os.system("python setup.py sdist upload")
@@ -21,10 +56,11 @@ if sys.argv[-1] == "publish":
 PY3 = sys.version_info[0] == 3
 required = ['requests==0.14.1', 'clint==0.3.1', 'docopt==0.4.1', 'six==1.2.0']
 test_suite = 'tests.unit'
-tests_require = ['mock==0.8.0']
+tests_require = ['mock==0.8.0', 'coverage==3.5.3']
 if not PY3:
     tests_require.append('unittest2==0.5.1')
     test_suite = 'unittest2.collector'
+
 
 setup(
     name='righteous',
@@ -62,5 +98,8 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: Implementation :: PyPy',
     ),
+    cmdclass={'test': Coverage},
 )
