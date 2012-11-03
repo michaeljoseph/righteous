@@ -1,6 +1,6 @@
 from uuid import uuid4
-from testify import (assert_equal, assert_not_equal,
-    class_teardown, setup, teardown)
+from testify import (
+    assert_equal, assert_not_equal, class_teardown, setup, teardown)
 import righteous
 from .base import RighteousTestCase
 
@@ -34,10 +34,11 @@ class ServerTestCase(RighteousTestCase):
             righteous.delete_server(server['href'])
 
     def _create_server(self, instance_type='m1.small'):
-        parameters = dict(envname=self.env, email=self.username,
-            mode='unattended', branches='none')
-        successful, location = righteous.create_and_start_server(self.env,
-            instance_type, server_template_parameters=parameters)
+        parameters = dict(
+            envname=self.env, email=self.username, mode='unattended',
+            branches='none')
+        successful, location = righteous.create_and_start_server(
+            self.env, instance_type, server_template_parameters=parameters)
         assert successful
         assert location is not None
         if self.delete_server:

@@ -19,8 +19,8 @@ class RequestsTestCase(unittest.TestCase):
 
         with patch('righteous.api.base.requests') as mock_requests:
             righteous.api.base._request('/test')
-            mock_requests.request.assert_called_once_with('GET',
-                'https://my.rightscale.com/api/acct/account_id/test',
+            mock_requests.request.assert_called_once_with(
+                'GET', 'https://my.rightscale.com/api/acct/account_id/test',
                 headers=headers, config={}, data=None)
 
     def test_request_no_prepend(self):
@@ -30,8 +30,8 @@ class RequestsTestCase(unittest.TestCase):
 
         with patch('righteous.api.base.requests') as mock_requests:
             righteous.api.base._request('/test', prepend_api_base=False)
-            mock_requests.request.assert_called_once_with('GET', '/test',
-                headers=headers, config={}, data=None)
+            mock_requests.request.assert_called_once_with(
+                'GET', '/test', headers=headers, config={}, data=None)
 
 
 class ExtractTemplateIdTestCase(ApiTestCase):
@@ -42,7 +42,8 @@ class ExtractTemplateIdTestCase(ApiTestCase):
             'account_id/ec2_server_templates/12345'), '12345')
 
     def test_unknown_ec2_template_href(self):
-        assert not _extract_template_id('https://my.rightscale.com/api/acct/'
+        assert not _extract_template_id(
+            'https://my.rightscale.com/api/acct/'
             'account_id/rackspace_server_templates/12345')
 
 
@@ -53,13 +54,15 @@ class BuildHeaderTestCase(RighteousTestCase):
 
     def test_additional_headers(self):
         headers = {'foo': 'bar'}
-        self.assertEqual(_build_headers(headers),
+        self.assertEqual(
+            _build_headers(headers),
             {'X-API-VERSION': '1.0', 'foo': 'bar'})
 
     def test_cookie_headers(self):
         config.settings.cookies = 'cookie_value'
         headers = {'baz': 'bar'}
-        self.assertEqual(_build_headers(headers),
+        self.assertEqual(
+            _build_headers(headers),
             {'X-API-VERSION': '1.0', 'baz': 'bar', 'Cookie': 'cookie_value'})
 
 
@@ -87,7 +90,8 @@ class InitialiseTestCase(RighteousTestCase):
 
         self.assertEqual(righteous.config.settings.default_deployment_id, '22')
         server_parameters = righteous.config.settings.create_server_parameters
-        self.assertEqual(server_parameters['deployment_href'],
+        self.assertEqual(
+            server_parameters['deployment_href'],
             'https://my.rightscale.com/api/acct/account/deployments/22')
 
 
@@ -113,8 +117,8 @@ class LoginTestCase(RighteousTestCase):
         self.response.headers['set-cookie'] = 'cookie_value'
         login_result = righteous.login()
         assert login_result
-        self.request.assert_called_once_with('/login',
-            headers={'Authorization': 'Basic %s' % auth})
+        self.request.assert_called_once_with(
+            '/login', headers={'Authorization': 'Basic %s' % auth})
 
     def test_login_with_credentials(self):
         username, password, account_id = 'foo', 'bar', '123'
@@ -124,8 +128,8 @@ class LoginTestCase(RighteousTestCase):
         self.response.headers['set-cookie'] = 'cookie_value'
         login_result = righteous.login(username, password, account_id)
         assert login_result
-        self.request.assert_called_once_with('/login',
-            headers={'Authorization': 'Basic %s' % auth})
+        self.request.assert_called_once_with(
+            '/login', headers={'Authorization': 'Basic %s' % auth})
 
 
 class LookupServerTestCase(ApiTestCase):
@@ -135,27 +139,25 @@ class LookupServerTestCase(ApiTestCase):
         super(LookupServerTestCase, self).setUp()
 
     def test_lookup_unconfigured(self):
-        self.assertRaises(ValueError,
-            righteous.api.base.lookup_by_href_or_nickname,
-            None,
-            None,
-            righteous.api.server.find_server)
+        self.assertRaises(
+            ValueError, righteous.api.base.lookup_by_href_or_nickname,
+            None, None, righteous.api.server.find_server)
 
     def test_lookup_href(self):
-        href = righteous.api.base.lookup_by_href_or_nickname('/foo/bar', None,
-            righteous.api.server.find_server)
+        href = righteous.api.base.lookup_by_href_or_nickname(
+            '/foo/bar', None, righteous.api.server.find_server)
         self.assertEqual(href, '/foo/bar')
 
     def test_lookup_nickname(self):
         self.response.content = json.dumps([{'href': '/naruto'}])
-        href = righteous.api.base.lookup_by_href_or_nickname(None, 'naruto',
-            righteous.api.server.find_server)
+        href = righteous.api.base.lookup_by_href_or_nickname(
+            None, 'naruto', righteous.api.server.find_server)
         self.assertEqual(href, '/naruto')
 
     def test_lookup_nickname_failure(self):
         self.response.content = '[]'
-        self.assertRaises(Exception,
-            righteous.api.base.lookup_by_href_or_nickname, None,
+        self.assertRaises(
+            Exception, righteous.api.base.lookup_by_href_or_nickname, None,
             'unknown', righteous.api.server.find_server)
 
     def test_lookup_server_href(self):

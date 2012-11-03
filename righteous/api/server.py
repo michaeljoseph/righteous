@@ -24,8 +24,9 @@ def list_servers(deployment_id=None):
         deployment_id = config.settings.default_deployment_id
 
     if not deployment_id:
-        raise Exception('Deployment id not specified in configuration or as '
-            'an API parameter')
+        raise Exception(
+            'Deployment id not specified in configuration or as an API '
+            'parameter')
 
     response = _request('/deployments/%s.js' % deployment_id)
     return json.loads(response.content)
@@ -65,8 +66,9 @@ def server_info(server_href, nickname=None):
          u'server_type', u'updated_at', u'server_template_href',
          u'current_instance_href', u'state', u'href', u'nickname']
     """
-    response = _request('%s.js' %
-        _lookup_server(server_href, nickname), prepend_api_base=False)
+    response = _request(
+        '%s.js' % _lookup_server(server_href, nickname),
+        prepend_api_base=False)
     return json.loads(response.content)
 
 
@@ -86,8 +88,9 @@ def server_settings(server_href, nickname=None):
         u'ip-address', u'aws-product-codes', u'aws-id', u'ec2-instance-type',
         u'launched-by']
     """
-    response = _request('%s/settings.js' %
-        _lookup_server(server_href, nickname), prepend_api_base=False)
+    response = _request(
+        '%s/settings.js' % _lookup_server(server_href, nickname),
+        prepend_api_base=False)
     return json.loads(response.content)
 
 
@@ -99,8 +102,8 @@ def start_server(server_href, nickname=None):
     :param nickname: (optional) String representing the nickname of the server
     :return: `requests.Response`
     """
-    return _request('%s/start' %
-        _lookup_server(server_href, nickname), method='POST',
+    return _request(
+        '%s/start' % _lookup_server(server_href, nickname), method='POST',
         prepend_api_base=False)
 
 
@@ -112,8 +115,8 @@ def stop_server(server_href, nickname=None):
     :param nickname: (optional) String representing the nickname of the server
     :return: `requests.Response`
     """
-    return _request('%s/stop' %
-        _lookup_server(server_href, nickname), method='POST',
+    return _request(
+        '%s/stop' % _lookup_server(server_href, nickname), method='POST',
         prepend_api_base=False).status_code == 201
 
 
@@ -125,8 +128,9 @@ def delete_server(server_href, nickname=None):
     :param nickname: (optional) String representing the nickname of the server
     :return: Boolean of operation success/failure
     """
-    return _request(_lookup_server(server_href, nickname),
-        method='DELETE', prepend_api_base=False).status_code == 200
+    return _request(
+        _lookup_server(server_href, nickname), method='DELETE',
+        prepend_api_base=False).status_code == 200
 
 
 def create_server(nickname, instance_type, create_server_parameters=None):
@@ -146,8 +150,9 @@ def create_server(nickname, instance_type, create_server_parameters=None):
 
     # TODO: error if no instance type key exists
     instance_server_href = create_server_parameters[instance_type]
-    create_server_parameters = dict((k, v) for k, v in
-        create_server_parameters.items() if not k.startswith('m1'))
+    create_server_parameters = dict(
+        (k, v) for k, v in create_server_parameters.items()
+        if not k.startswith('m1'))
 
     for key, value in create_server_parameters.items():
         create_data['server[%s]' % key] = value
@@ -155,7 +160,8 @@ def create_server(nickname, instance_type, create_server_parameters=None):
 
     response = _request('/servers', method='POST', body=urlencode(create_data))
     location = response.headers.get('location')
-    debug('Created server %s: %s (%s:%s)' % (nickname, location,
+    debug(
+        'Created server %s: %s (%s:%s)' % (nickname, location,
         response.status_code, response.content))
     # TODO: error responses
     return location
@@ -171,16 +177,18 @@ def set_server_parameters(server_href, parameters):
     """
     input_data = []
     for key in sorted(parameters.keys()):
-        input_data.append('server[parameters][%s]=text:%s'
-            % (key.upper(), parameters[key]))
+        input_data.append(
+            'server[parameters][%s]=text:%s' % (key.upper(), parameters[key]))
     update = '&'.join(input_data)
-    return _request(server_href, method='PUT', body=update,
+    return _request(
+        server_href, method='PUT', body=update,
         headers={'Content-Type': 'application/x-www-form-urlencoded'},
         prepend_api_base=False)
 
 
-def create_and_start_server(nickname, instance_type,
-        create_server_parameters=None, server_template_parameters=None):
+def create_and_start_server(
+        nickname, instance_type, create_server_parameters=None,
+        server_template_parameters=None):
     """
     Creates and starts a server.
     Returns a tuple of operation status, href of the created, started server
@@ -193,8 +201,8 @@ def create_and_start_server(nickname, instance_type,
                                        ServerTemplate parameters
     :return: tuple of operation success and server href of the new instance
     """
-    server_href = create_server(nickname, instance_type,
-        create_server_parameters)
+    server_href = create_server(
+        nickname, instance_type, create_server_parameters)
 
     if server_href:
         location = None
@@ -206,7 +214,8 @@ def create_and_start_server(nickname, instance_type,
         if success:
             location = start_server_response.headers['location']
         else:
-            debug('Start server %s failed with %s' % (server_href,
+            debug(
+                'Start server %s failed with %s' % (server_href,
                 start_server_response.content))
 
         return success, location

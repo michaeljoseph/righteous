@@ -21,14 +21,16 @@ class DeploymentTestCase(RighteousIntegrationTestCase):
     def test_list_deployments(self):
         deployments = righteous.list_deployments()
         assert len(deployments) > 0
-        assert_equal(sorted(deployments[0].keys()),
-            sorted([u'href', u'description', u'tags',
+        assert_equal(
+            sorted(deployments[0].keys()),
+            sorted([
+                u'href', u'description', u'tags',
                 u'default_ec2_availability_zone', u'default_vpc_subnet_href',
                 u'created_at', u'nickname', u'updated_at', u'servers']))
 
     def _create_deployment(self):
-        success, location = righteous.create_deployment(self.deployment,
-            'test deployment')
+        success, location = righteous.create_deployment(
+            self.deployment, 'test deployment')
         assert success
         assert location is not None
         if self.delete_deployment:
@@ -62,6 +64,6 @@ class DeploymentTestCase(RighteousIntegrationTestCase):
         assert success
         assert_not_equal(deployment_href, location)
         duplicated_deployment = righteous.deployment_info(location)
-        assert_equal(duplicated_deployment['nickname'],
-            self.deployment + ' v1')
+        assert_equal(
+            duplicated_deployment['nickname'], self.deployment + ' v1')
         self.deployments.append(location)

@@ -13,12 +13,15 @@ class RighteousIntegrationTestCase(TestCase):
             raise Exception('Please create a righteous.config file with '
                             'appropriate credentials')
 
-        self.auth = dict((key, config.get('auth', key))
-                for key in config.options('auth'))
-        self.server = dict((key, config.get('server-defaults', key))
-                for key in config.options('server-defaults'))
+        self.auth = dict(
+            (key, config.get('auth', key))
+            for key in config.options('auth'))
+        self.server = dict(
+            (key, config.get('server-defaults', key))
+            for key in config.options('server-defaults'))
 
-        righteous.init(self.auth['username'], self.auth['password'],
+        righteous.init(
+            self.auth['username'], self.auth['password'],
             self.auth['account_id'], **self.server)
 
         if not righteous.config.settings.cookies:
