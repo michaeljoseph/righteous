@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-__version__ = '0.4.0'
-__author__ = 'Michael Joseph'
-
 import os
 import sys
 
@@ -14,6 +10,24 @@ except ImportError:
     from distutils.core import setup
 
 from setuptools.command.test import test as TestCommand
+
+
+def extract_attribute(attribute_name):
+    with open('righteous/__init__.py') as input_file:
+        for line in input_file:
+            if line.startswith(attribute_name):
+                import ast
+                return ast.literal_eval(line.split('=')[1].strip())
+
+
+def version():
+    """Return version string."""
+    return extract_attribute('__version__')
+
+
+def author():
+    """Return author string."""
+    return extract_attribute('__author__')
 
 
 class Coverage(TestCommand):
@@ -64,7 +78,7 @@ if not PY3:
 
 setup(
     name='righteous',
-    version=__version__,
+    version=version(),
     description='Python RightScale API client.',
     long_description=(
         '**righteous** is a Python client implementation of the '
@@ -75,7 +89,7 @@ setup(
         'RTFD: `http://righteous.readthedocs.org '
         '<http://righteous.readthedocs.org>`_'
     ),
-    author=__author__,
+    author=author(),
     author_email='michaeljoseph@gmail.com',
     url='https://github.com/michaeljoseph/righteous',
     packages=[
