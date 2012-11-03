@@ -10,9 +10,4 @@ install:
   - python setup.py -q install
 
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]
-    then
-        make test pep8
-    else
-        make ci
-    fi
+  - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then make test pep8; else make ci; fi" 
