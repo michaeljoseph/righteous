@@ -70,7 +70,7 @@ if sys.argv[-1] == "publish":
 PY3 = sys.version_info[0] == 3
 required = ['requests==0.14.1', 'clint==0.3.1', 'docopt==0.4.1', 'six==1.2.0']
 test_suite = 'tests.unit'
-tests_require = ['mock==0.8.0', 'coverage==3.5.3']
+tests_require = ['mock==1.0.0', 'coverage==3.5.3']
 if not PY3:
     tests_require.append('unittest2==0.5.1')
     test_suite = 'unittest2.collector'
