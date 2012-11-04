@@ -11,3 +11,4 @@ righteous.egg-info
 dist
 .coverage
 htmlcov/
+*.egg/

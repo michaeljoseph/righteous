@@ -1,5 +1,5 @@
-import omnijson as json
-from urllib import urlencode, quote
+import json
+from ..compat import urlencode, quote
 from .base import _request, debug, lookup_by_href_or_nickname
 
 
@@ -62,9 +62,9 @@ def deployment_info(deployment_href, nickname=None):
          u'default_vpc_subnet_href', u'created_at', u'nickname', u'updated_at',
          u'servers']
     """
-    response = _request('%s.js' % _lookup_deployment(
-                                    deployment_href, nickname),
-                        prepend_api_base=False)
+    response = _request(
+        '%s.js' % _lookup_deployment(deployment_href, nickname),
+        prepend_api_base=False)
     return json.loads(response.content)
 
 
@@ -78,17 +78,18 @@ def create_deployment(nickname, description):
     location = None
     create_data = {'deployment[nickname]': nickname,
                    'deployment[description]': description}
-    response = _request('/deployments',
-        method='POST', body=urlencode(create_data))
+    response = _request(
+        '/deployments', method='POST', body=urlencode(create_data))
 
     success = response.status_code == 201
     if success:
         location = response.headers.get('location')
-        debug('Created deployment %s: %s (%s:%s)' % (nickname, location,
+        debug(
+            'Created deployment %s: %s (%s:%s)' % (nickname, location,
             response.status_code, response.content))
     else:
-        debug('Error creating deployment %s: %s' % (nickname,
-            response.content))
+        debug(
+            'Error creating deployment %s: %s' % (nickname, response.content))
     # TODO: error responses
     return success, location
 
@@ -102,7 +103,8 @@ def delete_deployment(deployment_href, nickname=None):
                      deployment
     :return: Boolean of operation success/failure
     """
-    return _request(_lookup_deployment(deployment_href, nickname),
+    return _request(
+        _lookup_deployment(deployment_href, nickname),
         method='DELETE', prepend_api_base=False).status_code == 200
 
 
@@ -117,17 +119,19 @@ def duplicate_deployment(deployment_href, nickname=None):
              duplicated instance
     """
     location = None
-    response = _request('%s/duplicate' %
-        _lookup_deployment(deployment_href, nickname), method='POST',
-        prepend_api_base=False)
+    response = _request(
+        '%s/duplicate' % _lookup_deployment(deployment_href, nickname),
+        method='POST', prepend_api_base=False)
 
     success = response.status_code == 201
     if success:
         location = response.headers.get('location')
-        debug('Duplicated deployment %s: %s (%s:%s)' % (nickname, location,
+        debug(
+            'Duplicated deployment %s: %s (%s:%s)' % (nickname, location,
             response.status_code, response.content))
     else:
-        debug('Error duplicating deployment %s: %s' % (nickname,
+        debug(
+            'Error duplicating deployment %s: %s' % (nickname,
             response.content))
     # TODO: error responses
     return success, location

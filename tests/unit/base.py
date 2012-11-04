@@ -1,25 +1,30 @@
-from testify import TestCase, setup, teardown
 import requests
-import righteous
+from mock import Mock, patch
+import six
 from righteous import config
 from righteous.config import Settings
-from mock import Mock, patch
+import righteous
+
+unittest = None
+if six.PY3:
+    import unittest
+    unittest = unittest
+else:
+    import unittest2
+    unittest = unittest2
 
 
-class RighteousTestCase(TestCase):
+class RighteousTestCase(unittest.TestCase):
 
     def setup_patching(self, request_module):
         self.requests_patcher = patch(request_module)
         self.request = self.requests_patcher.start()
-        self.response = Mock(spec=requests.Response,
-            status_code=200,
-            headers={},
-            text='')
+        self.response = Mock(
+            spec=requests.Response, status_code=200, headers={}, text='')
         self.request.return_value = self.response
         self.initialise_settings()
 
-    @teardown
-    def teardown(self):
+    def tearDown(self):
         if hasattr(self, 'requests_patcher'):
             self.requests_patcher.stop()
             self.initialise_settings()
@@ -37,6 +42,8 @@ class RighteousTestCase(TestCase):
 
 class ApiTestCase(RighteousTestCase):
 
-    @setup
-    def setup(self):
+    def setUp(self):
         righteous.init('user', 'pass', 'account_id')
+
+    def tearDown(self):
+        self.initialise_settings()

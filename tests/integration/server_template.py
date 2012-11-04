@@ -22,10 +22,10 @@ class ServerTemplateTestCase(RighteousIntegrationTestCase):
         if not self.config.has_section('server-templates'):
             raise Exception('Ensure that righteous.config has a '
                             'server-templates section')
-        multi_cloud_image = self.config.get('server-templates',
-            'multi_cloud_image')
-        success, location = righteous.create_server_template(self.template,
-            'test template', multi_cloud_image)
+        multi_cloud_image = self.config.get(
+            'server-templates', 'multi_cloud_image')
+        success, location = righteous.create_server_template(
+            self.template, 'test template', multi_cloud_image)
         assert success
         assert location is not None
         if self.delete_template:
@@ -36,7 +36,8 @@ class ServerTemplateTestCase(RighteousIntegrationTestCase):
         self._create_template()
         templates = righteous.list_server_templates()
         assert len(templates) > 0
-        assert_equal(sorted(templates[0].keys()),
+        assert_equal(
+            sorted(templates[0].keys()),
             sorted([u'description', u'is_head_version', u'created_at',
                     u'updated_at', u'href', u'version', u'nickname']))
 

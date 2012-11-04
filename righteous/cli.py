@@ -44,8 +44,10 @@ def error(message):
 def print_running_servers(servers, exclude_states=['stopped']):
 
     def server_owner(server_info):
-        owner = [p['value'][5:] for p in server_info['parameters']
-            if p['name'] == 'EMAIL']
+        owner = [
+            p['value'][5:] for p in server_info['parameters']
+            if p['name'] == 'EMAIL'
+        ]
         return owner[0] if len(owner) else None
 
     output = StringIO()
@@ -55,13 +57,18 @@ def print_running_servers(servers, exclude_states=['stopped']):
         server_info = righteous.server_info(server['href'])
         server_settings = righteous.server_settings(server['href'])
         owner = server_owner(server_info)
-        running = now - datetime.strptime(server['created_at'],
-            '%Y/%m/%d %H:%M:%S +0000')
+        running = now - datetime.strptime(
+            server['created_at'], '%Y/%m/%d %H:%M:%S +0000'
+        )
         if server['state'] not in exclude_states:
-            server_list.append(dict(days=running.days,
-                instance=server['nickname'],
-                size=server_settings['ec2-instance-type'],
-                creator=owner))
+            server_list.append(
+                dict(
+                    days=running.days,
+                    instance=server['nickname'],
+                    size=server_settings['ec2-instance-type'],
+                    creator=owner
+                )
+            )
 
     puts(columns(
         [(colored.red('Instance')), COL],
@@ -78,7 +85,7 @@ def print_running_servers(servers, exclude_states=['stopped']):
             [str(line['days']), COL],
         ), stream=output.write)
 
-    print output.getvalue()
+    print(output.getvalue())
 
 
 def initialise(arguments):
@@ -93,15 +100,16 @@ def initialise(arguments):
         error('No configuration found. Either create "%s" or specify a '
               'configuration file with -c FILE' % (AUTH_FILE))
 
-    username, password, account_id = tuple(config.get('auth', key)
-        for key in config.options('auth'))
+    username, password, account_id = tuple(
+        config.get('auth', key) for key in config.options('auth')
+    )
 
     server_parameters = dict(config.items('server-defaults'))
     righteous.initialise(username, password, account_id, **server_parameters)
 
     if righteous.login():
-        cache_authentication(username, password, account_id,
-            config_file or AUTH_FILE)
+        cache_authentication(
+            username, password, account_id, config_file or AUTH_FILE)
     else:
         error('Authentication failed')
 
@@ -130,8 +138,7 @@ def create(arguments):
         puts(colored.green('Created and started environment %s @ %s' %
             (arguments['<environment>'][0], location)))
     else:
-        error('Error creating environment %s' %
-            arguments['<environment>'][0])
+        error('Error creating environment %s' % arguments['<environment>'][0])
 
 
 def stop(arguments):
@@ -148,8 +155,9 @@ def stop(arguments):
             puts(colored.cyan('Initiated decommission of %s @ %s' %
                 (environment, server['href'])))
         else:
-            puts_err(colored.magenta('Error stopping server %s @ %s' %
-                (environment, server['href'])))
+            puts_err(
+                colored.magenta('Error stopping server %s @ %s' % (
+                    environment, server['href'])))
 
 
 def delete(arguments):
@@ -161,8 +169,9 @@ def delete(arguments):
             puts(colored.green('Successfully deleted %s @ %s' %
                 (environment, server['href'])))
         else:
-            puts_err(colored.magenta('Error deleting %s @ %s' %
-                (environment, server['href'])))
+            puts_err(
+                colored.magenta('Error deleting %s @ %s' % (
+                    environment, server['href'])))
 
 
 def status(arguments):
@@ -195,10 +204,11 @@ def status(arguments):
 
             ), stream=output.write)
         else:
-            puts(colored.red('%s: Not Found' % environment),
-                    stream=output.write)
+            puts(
+                colored.red('%s: Not Found' % environment),
+                stream=output.write)
 
-    print output.getvalue()
+    print(output.getvalue())
 
 
 def main():

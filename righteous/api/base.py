@@ -7,13 +7,10 @@ Implements the RightScale API for EC2 instance management.
 import warnings
 import sys
 import base64
+import six
 from logging import getLogger
 from .. import config
-# HACK: to allow setup.py to import __version__ from righteous/__init__.py
-try:
-    import requests
-except ImportError:
-    pass
+import requests
 
 log = getLogger(__name__)
 
@@ -47,13 +44,14 @@ def _request(path, method='GET', body=None, headers={}, prepend_api_base=True):
         path = config.account_url + config.settings.account_id + path
     headers = _build_headers(headers=headers)
     debug('%s to %s with data=%s, headers=%s', method, path, body, headers)
-    return requests.request(method, path, data=body, headers=headers,
+    return requests.request(
+        method, path, data=body, headers=headers,
         config=config.settings.requests_config or {})
 
 
 def init(username, password, account_id, **kwargs):
-    warnings.warn('init deprecated, use initialise instead.',
-        DeprecationWarning)
+    warnings.warn(
+        'init deprecated, use initialise instead.', DeprecationWarning)
     initialise(username, password, account_id, **kwargs)
 
 
@@ -68,8 +66,8 @@ def initialise(username, password, account_id, **kwargs):
     """
 
     if not username or not password or not account_id:
-        raise Exception('Username, password and account_id are '
-            'required parameters')
+        raise Exception(
+            'Username, password and account_id are required parameters')
 
     config.settings.username = username
     config.settings.password = password
@@ -84,7 +82,8 @@ def initialise(username, password, account_id, **kwargs):
     for key, value in kwargs.items():
         config.settings.create_server_parameters[key] = value
         if key == 'default_deployment_id':
-            href = '%s%s/deployments/%s' % (config.account_url, account_id,
+            href = '%s%s/deployments/%s' % (
+                config.account_url, account_id,
                 config.settings.default_deployment_id)
             config.settings.create_server_parameters['deployment_href'] = href
 
@@ -108,12 +107,14 @@ def login(username=None, password=None, account_id=None):
         account_id = config.settings.account_id
 
     if not username or not password or not account_id:
-        raise Exception('Username, password or account_id not specified in '
-            'configuration or as an API parameter')
+        raise Exception(
+            'Username, password or account_id not specified in configuration '
+            'or as an API parameter')
 
     auth_hash = '%s:%s' % (username, password)
+
     response = _request('/login', headers={
-        'Authorization': 'Basic %s' % base64.encodestring(auth_hash)[:-1]
+        'Authorization': 'Basic %s' % base64.b64encode(six.b(auth_hash))[:-1]
     })
 
     if response.status_code == 204:
