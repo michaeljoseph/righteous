@@ -1,4 +1,4 @@
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 __author__ = 'Michael Joseph'
 
 from .api.base import init, initialise, login
