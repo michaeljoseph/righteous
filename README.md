@@ -1,10 +1,14 @@
 # righteous: Python RightScale API client
 
+[![Build Status](https://secure.travis-ci.org/michaeljoseph/righteous.png)](http://travis-ci.org/michaeljoseph/righteous)
+[![Stories in Ready](https://badge.waffle.io/michaeljoseph/righteous.png?label=ready)](https://waffle.io/michaeljoseph/righteous)
+[![pypi version](https://badge.fury.io/py/righteous.png)](http://badge.fury.io/py/righteous)
+[![# of downloads](https://pypip.in/d/righteous/badge.png)](https://crate.io/packages/righteous?version=latest)
+[![code coverage](https://coveralls.io/repos/michaeljoseph/righteous/badge.png?branch=master)](https://coveralls.io/r/michaeljoseph/righteous?branch=master)
+
 **righteous** is a Python client implementation of the [RightScale API](http://support.rightscale.com/15-References/RightScale_API_Reference_Guide) for EC2 instance management.
 
 ![righteous](https://github.com/michaeljoseph/righteous/raw/master/resources/righteous.jpg)
-
-[![Build Status](https://secure.travis-ci.org/michaeljoseph/righteous.png)](http://travis-ci.org/michaeljoseph/righteous)
 
 righteous provides an API and CLI to create, start/stop, delete, remove and introspect RightScale EC2 Servers.
 This library implements RightScale API 1.0 and has only been tested with EC2 instances using ServerTemplates and managed in a Deployment.
