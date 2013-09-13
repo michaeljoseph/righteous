@@ -2,6 +2,7 @@ import righteous
 from ConfigParser import SafeConfigParser
 from ..compat import unittest
 
+
 class RighteousIntegrationTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -22,10 +23,8 @@ class RighteousIntegrationTestCase(unittest.TestCase):
             self.auth['username'], self.auth['password'],
             self.auth['account_id'], **self.server)
 
-
         self.config = config
         self.username = self.auth['username']
-
 
     def test_login(self):
         self.assertTrue(righteous.login())
