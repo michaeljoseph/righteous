@@ -29,4 +29,3 @@ class RighteousIntegrationTestCase(unittest.TestCase):
 
     def test_login(self):
         self.assertTrue(righteous.login())
-        assert False
