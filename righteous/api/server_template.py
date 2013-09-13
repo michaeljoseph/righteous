@@ -82,8 +82,9 @@ def create_server_template(nickname, description, multi_cloud_image_href):
     if success:
         location = response.headers.get('location')
         debug(
-            'Created server template %s: %s (%s:%s)' % (nickname, location,
-            response.status_code, response.content))
+            'Created server template %s: %s (%s:%s)' %
+            (nickname, location, response.status_code, response.content)
+        )
     # TODO: error responses
     return success, location
 
