@@ -114,7 +114,7 @@ def login(username=None, password=None, account_id=None):
     auth_hash = '%s:%s' % (username, password)
 
     response = _request('/login', headers={
-        'Authorization': 'Basic %s' % base64.b64encode(six.b(auth_hash))[:-1]
+        'Authorization': 'Basic %s' % base64.b64encode(six.b(auth_hash))
     })
 
     if response.status_code == 204:

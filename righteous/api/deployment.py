@@ -85,8 +85,9 @@ def create_deployment(nickname, description):
     if success:
         location = response.headers.get('location')
         debug(
-            'Created deployment %s: %s (%s:%s)' % (nickname, location,
-            response.status_code, response.content))
+            'Created deployment %s: %s (%s:%s)' %
+            (nickname, location, response.status_code, response.content)
+        )
     else:
         debug(
             'Error creating deployment %s: %s' % (nickname, response.content))
@@ -127,11 +128,13 @@ def duplicate_deployment(deployment_href, nickname=None):
     if success:
         location = response.headers.get('location')
         debug(
-            'Duplicated deployment %s: %s (%s:%s)' % (nickname, location,
-            response.status_code, response.content))
+            'Duplicated deployment %s: %s (%s:%s)' %
+            (nickname, location, response.status_code, response.content)
+        )
     else:
         debug(
-            'Error duplicating deployment %s: %s' % (nickname,
-            response.content))
+            'Error duplicating deployment %s: %s' %
+            (nickname, response.content)
+        )
     # TODO: error responses
     return success, location

@@ -109,7 +109,7 @@ class LoginTestCase(RighteousTestCase):
     def test_login_with_init_credentials(self):
         username, password, account_id = 'user', 'pass', 'account_id'
 
-        auth = base64.b64encode(six.b('%s:%s' % (username, password)))[:-1]
+        auth = base64.b64encode(six.b('%s:%s' % (username, password)))
 
         righteous.init(username, password, account_id)
 
@@ -122,7 +122,7 @@ class LoginTestCase(RighteousTestCase):
 
     def test_login_with_credentials(self):
         username, password, account_id = 'foo', 'bar', '123'
-        auth = base64.b64encode(six.b('%s:%s' % (username, password)))[:-1]
+        auth = base64.b64encode(six.b('%s:%s' % (username, password)))
 
         self.response.status_code = 204
         self.response.headers['set-cookie'] = 'cookie_value'
