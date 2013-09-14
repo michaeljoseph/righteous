@@ -74,14 +74,13 @@ Remove an instance
 
 ### Development / Running the tests
 
-    $ python setup.py test
+    $ nosetests
 
 The integration tests take a couple of minutes to run since they test all the current functionality (creating, starting, stopping and deleting environments, server templates and deployments)
 against RightScale.
 These tests require a configured `righteous.config` in the root of the directory, so copy and customise `righteous.config.template` before running:
 
-    # FIXME
-    $ testify tests.integration 
+    $ nosetests tests.integration.base
 
 
 Michael Joseph 2012

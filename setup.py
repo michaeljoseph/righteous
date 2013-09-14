@@ -68,13 +68,21 @@ if sys.argv[-1] == "publish":
     sys.exit()
 
 PY3 = sys.version_info[0] == 3
-required = ['requests==0.14.1', 'clint==0.3.1', 'docopt==0.4.1', 'six==1.2.0']
-test_suite = 'tests.unit'
-tests_require = ['mock==1.0.1', 'coverage==3.5.3']
-if not PY3:
-    tests_require.append('unittest2==0.5.1')
-    test_suite = 'unittest2.collector'
+required = [
+    'clint < 1.0.0',
+    'docopt < 1.0.0',
+    'requests >= 1.0.0, < 2.0.0',
+    'six < 2.0.0',
+]
 
+test_suite = 'tests.unit'
+tests_require = [
+    'mock < 2.0.0',
+    'coverage < 4.0.0',
+]
+if not PY3:
+    tests_require.append('unittest2 < 1.0.0')
+    test_suite = 'unittest2.collector'
 
 setup(
     name='righteous',

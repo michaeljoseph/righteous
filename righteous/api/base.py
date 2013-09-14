@@ -44,9 +44,9 @@ def _request(path, method='GET', body=None, headers={}, prepend_api_base=True):
         path = config.account_url + config.settings.account_id + path
     headers = _build_headers(headers=headers)
     debug('%s to %s with data=%s, headers=%s', method, path, body, headers)
-    return requests.request(
-        method, path, data=body, headers=headers,
-        config=config.settings.requests_config or {})
+    response = requests.request(method, path, data=body, headers=headers)
+    debug('response: %s', response.headers)
+    return response
 
 
 def init(username, password, account_id, **kwargs):

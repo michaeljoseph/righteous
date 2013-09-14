@@ -21,7 +21,7 @@ class RequestsTestCase(unittest.TestCase):
             righteous.api.base._request('/test')
             mock_requests.request.assert_called_once_with(
                 'GET', 'https://my.rightscale.com/api/acct/account_id/test',
-                headers=headers, config={}, data=None)
+                headers=headers, data=None)
 
     def test_request_no_prepend(self):
         username, password, account_id = 'user', 'pass', 'account_id'
@@ -31,7 +31,7 @@ class RequestsTestCase(unittest.TestCase):
         with patch('righteous.api.base.requests') as mock_requests:
             righteous.api.base._request('/test', prepend_api_base=False)
             mock_requests.request.assert_called_once_with(
-                'GET', '/test', headers=headers, config={}, data=None)
+                'GET', '/test', headers=headers, data=None)
 
 
 class ExtractTemplateIdTestCase(ApiTestCase):
