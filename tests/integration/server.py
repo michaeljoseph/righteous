@@ -1,6 +1,4 @@
 from uuid import uuid4
-from testify import (
-    assert_equal, assert_not_equal, class_teardown, setup, teardown)
 import righteous
 from .base import RighteousTestCase
 
@@ -8,21 +6,18 @@ from .base import RighteousTestCase
 class ServerTestCase(RighteousTestCase):
     envs = []
 
-    @setup
-    def prepare_test(self):
+    def setUp(self):
         super(RighteousTestCase, self).prepare_test()
         self.delete_server = True
         self.env = 'env-%s' % uuid4().hex
 
-    @teardown
-    def stop_servers(self):
+    def tearDown(self):
         if self.delete_server:
             server = righteous.find_server(self.env)
             if server:
                 righteous.stop_server(server['href'])
 
-    @class_teardown
-    def delete_servers(self):
+    def tearDownClass(self):
         for env in self.envs:
             stopped = False
             while not stopped:
@@ -39,31 +34,31 @@ class ServerTestCase(RighteousTestCase):
             branches='none')
         successful, location = righteous.create_and_start_server(
             self.env, instance_type, server_template_parameters=parameters)
-        assert successful
-        assert location is not None
+        self.assertTrue(successful)
+        self.assertTrue(location is not None)
         if self.delete_server:
             self.envs.append(self.env)
 
     def test_list_servers(self):
         servers = righteous.list_servers()
-        assert 'servers' in servers
+        self.assertTrue('servers' in servers)
         self.delete_server = False
 
     def test_server_status(self):
         self._create_server()
 
         server = righteous.find_server(self.env)
-        assert server is not None
+        self.assertTrue(server is not None)
         server_settings = righteous.server_settings(server['href'])
-        assert server_settings is not None
+        self.assertTrue(server_settings is not None)
         server_info = righteous.server_info(server['href'])
-        assert server_info is not None
-        assert_equal(server_settings['ec2-instance-type'], 'm1.small')
-        assert_equal(server['state'], 'pending')
+        self.assertTrue(server_info is not None)
+        self.assertEqual(server_settings['ec2-instance-type'], 'm1.small')
+        self.assertEqual(server['state'], 'pending')
 
     def test_create_server(self):
         location = righteous.create_server(self.env, 'm1.small')
-        assert_not_equal(location, None)
+        self.assertNotEqual(location, None)
         self.envs.append(self.env)
 
     def test_create_and_start_server(self):
@@ -73,20 +68,16 @@ class ServerTestCase(RighteousTestCase):
         self._create_server()
 
         server = righteous.find_server(self.env)
-        successful = righteous.stop_server(server['href'])
-        assert successful
+        self.assertTrue(righteous.stop_server(server['href']))
 
     def test_delete_server(self):
         self._create_server()
         server = righteous.find_server(self.env)
-        successful = righteous.stop_server(server['href'])
-        assert successful
+        self.assertTrue(righteous.stop_server(server['href']))
 
         stopped = False
         while not stopped:
             server = righteous.find_server(self.env)
             stopped = server['state'] == 'stopped'
-        successful = righteous.delete_server(server['href'])
-        assert successful
-
+        self.assertTrue(righteous.delete_server(server['href']))
         self.delete_server = False
