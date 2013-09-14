@@ -130,7 +130,8 @@ def delete_server(server_href, nickname=None):
     """
     return _request(
         _lookup_server(server_href, nickname), method='DELETE',
-        prepend_api_base=False).status_code == 200
+        prepend_api_base=False
+    ).status_code == 200
 
 
 def create_server(nickname, instance_type, create_server_parameters=None):
@@ -161,8 +162,9 @@ def create_server(nickname, instance_type, create_server_parameters=None):
     response = _request('/servers', method='POST', body=urlencode(create_data))
     location = response.headers.get('location')
     debug(
-        'Created server %s: %s (%s:%s)' % (nickname, location,
-        response.status_code, response.content))
+        'Created server %s: %s (%s:%s)' %
+        (nickname, location, response.status_code, response.content)
+    )
     # TODO: error responses
     return location
 
@@ -215,8 +217,9 @@ def create_and_start_server(
             location = start_server_response.headers['location']
         else:
             debug(
-                'Start server %s failed with %s' % (server_href,
-                start_server_response.content))
+                'Start server %s failed with %s' %
+                (server_href, start_server_response.content)
+            )
 
         return success, location
     else:
