@@ -1,4 +1,5 @@
 coverage < 4.0.0
+changes < 1.0.0
 clint < 1.0.0
 docopt < 1.0.0 
 flake8 < 3.0.0
