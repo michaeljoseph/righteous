@@ -1,6 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import os
+import re
 import sys
 
 try:
@@ -11,23 +10,9 @@ except ImportError:
 
 from setuptools.command.test import test as TestCommand
 
-
-def extract_attribute(attribute_name):
-    with open('righteous/__init__.py') as input_file:
-        for line in input_file:
-            if line.startswith(attribute_name):
-                import ast
-                return ast.literal_eval(line.split('=')[1].strip())
-
-
-def version():
-    """Return version string."""
-    return extract_attribute('__version__')
-
-
-def author():
-    """Return author string."""
-    return extract_attribute('__author__')
+init_py = open('changes/__init__.py').read()
+metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", init_py))
+metadata['doc'] = re.findall('"""(.+)"""', init_py)[0]
 
 
 class Coverage(TestCommand):
@@ -86,8 +71,8 @@ if not PY3:
 
 setup(
     name='righteous',
-    version=version(),
-    description='Python RightScale API client.',
+    version=metadata['version'],
+    description=metadata['doc'],
     long_description=(
         '**righteous** is a Python client implementation of the '
         '`RightScale API <http://support.rightscale.com/rdoc>`_ '
@@ -97,9 +82,9 @@ setup(
         'RTFD: `http://righteous.readthedocs.org '
         '<http://righteous.readthedocs.org>`_'
     ),
-    author=author(),
-    author_email='michaeljoseph@gmail.com',
-    url='https://github.com/michaeljoseph/righteous',
+    author=metadata['author'],
+    author_email=metadata['email'],
+    url=metadata['url'],
     packages=[
         'righteous',
         'righteous.api',

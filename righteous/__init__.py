@@ -1,5 +1,8 @@
 __version__ = '0.5.0'
+__url__ = 'https://github.com/michaeljoseph/righteous'
 __author__ = 'Michael Joseph'
+__email__ = 'michaeljoseph@gmail.com'
+
 
 from .api.base import init, initialise, login
 from .api.server import (
